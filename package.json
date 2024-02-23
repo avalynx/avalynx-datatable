@@ -1,0 +1,41 @@
+{
+  "name": "avalynx-datatable",
+  "title": "AvalynxDataTable",
+  "description": "AvalynxDatatable is a simple, lightweight, and customizable data table for the web. Based on Bootstrap >=5.3 without any framework dependencies.",
+  "version": "0.0.1",
+  "license": "MIT",
+  "main": "dist/js/avalynx-datatable.js",
+  "module": "dist/js/avalynx-datatable.esm.js",
+  "style": "dist/css/avalynx-datatable.css",
+  "files": [
+    "dist/css/avalynx-datatable.css",
+    "dist/js/avalynx-datatable.js",
+    "dist/js/avalynx-datatable.esm.js"
+  ],
+  "keywords": [
+    "avalynx",
+    "datatable",
+    "bootstrap",
+    "component",
+    "ajax",
+    "table"
+  ],
+  "dependencies": {
+    "bootstrap": ">=5.3"
+  },
+  "ignore": [
+    "package.json"
+  ],
+  "author": {
+    "name": "Juergen Schwind an the Avalynx-Datatable Team",
+    "url": "https://github.com/avalynx/avalynx-datatable/graphs/contributors"
+  },
+  "homepage": "https://github.com/avalynx/",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/avalynx/avalynx-datatable.git"
+  },
+  "bugs": {
+    "url": "https://github.com/avalynx/avalynx-datatable/issues"
+  }
+}

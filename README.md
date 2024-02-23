@@ -1,1 +1,164 @@
-# avalaynx-dt
+# AvalynxDataTable
+
+AvalynxDataTable is a simple, lightweight, and customizable data table component for web applications. It is designed to be used with Bootstrap version 5.3 or higher and does not require any framework dependencies.
+
+## Features
+
+- **Lightweight and Customizable**: Easily integrate with your web applications without heavy dependencies.
+- **Bootstrap Integration**: Designed for seamless integration with Bootstrap >= 5.3.
+- **Data Fetching**: Fetch data from any API endpoint.
+- **Sorting and Searching**: Built-in sorting and searching functionalities.
+- **Pagination**: Customizable pagination options including previous/next buttons and page range.
+- **Responsive**: Fully responsive design to work on various devices.
+
+## Example
+
+Here's a simple example of how to use AvalynxDataTable in your project:
+
+* [Overview](https://avalynx-datatable.jbs-newmedia.de/examples/index.html)
+
+
+## Installation
+
+To use AvalynxDataTable in your project, you can directly include it in your HTML file. Ensure you have Bootstrap 5.3 or higher included in your project for AvalynxDataTable to work correctly.
+
+First, include Bootstrap:
+
+```html
+<!-- Bootstrap -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3/dist/js/bootstrap.bundle.min.js"></script>
+```
+
+Then, include AvalynxDataTable:
+
+```html
+<link href="path/to/avalynx-datatable.css" rel="stylesheet">
+<script src="path/to/avalynx-datatable.js"></script>
+```
+
+Replace `path/to/avalynx-datatable.js` and `path/to/avalynx-datatable.css` with the actual path to the files in your project.
+
+## Installation via jsDelivr
+
+AvalynxDataTable is also available via [jsDelivr](https://www.jsdelivr.com/). You can include it in your project like this:
+
+```html
+<link href="https://cdn.jsdelivr.net/npm/avalynx-datatable/dist/avalynx-datatable.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/avalynx-datatable/dist/avalynx-datatable.js"></script>
+```
+
+Make sure to also include Bootstrap's JS/CSS in your project to ensure AvalynxDataTable displays correctly.
+
+## Installation via NPM
+
+AvalynxDataTable is also available as a npm package. You can add it to your project with the following command:
+
+```bash
+npm install avalynx-datatable
+```
+
+After installing, you can import AvalynxDataTable into your JavaScript file like this:
+
+```javascript
+import { AvalynxDataTable } from 'avalynx-datatable';
+import 'avalynx-datatable/dist/css/avalynx-datatable.min.css';
+```
+
+Make sure to also include Bootstrap's JS/CSS in your project to ensure AvalynxDataTable displays correctly.
+
+## Installation via Symfony AssetMapper
+
+```bash
+php bin/console importmap:require avalynx-datatable
+```
+
+After installing, you can import AvalynxDataTable into your JavaScript file like this:
+
+```javascript
+import { AvalynxDataTable } from 'avalynx-datatable';
+import 'avalynx-datatable/dist/css/avalynx-datatable.min.css';
+```
+
+Make sure to also include Bootstrap's JS/CSS in your project to ensure AvalynxDataTable displays correctly.
+
+## Usage
+
+To create a datatable, simply instantiate a new `AvalynxDataTable` object with the desired options:
+
+```html
+<div id="avalynx-datatable"></div>
+```
+
+```javascript
+new AvalynxDataTable("avalynx-datatable", {
+  apiUrl: "result.php",
+  perPage: 10,
+  search: "",
+  sorting: {
+    "name": "asc",
+    "age": "desc"
+  }
+}, {
+  showLabel: "Zeige",
+  entriesLabel: "Einträge",
+  searchLabel: "Suche",
+  previousLabel: "Zurück",
+  nextLabel: "Weiter",
+  showingEntries: (start, end, total) => `Zeige ${start} bis ${end} von ${total} Einträgen`,
+  showingFilteredEntries: (start, end, filtered, total) => `Zeige ${start} bis ${end} von ${filtered} Einträgen (gefiltert von ${total} Einträgen)`
+});
+```
+
+## Options
+
+AvalynxDataTable allows the following options for customization:
+
+- `id` (string): The ID of the element to attach the table to.
+- `options` (object): Configuration options for the table.
+  - `apiUrl` (string): URL to fetch the data from.
+  - `sorting` (object): The initial sorting configuration for the table. Format is an array of objects specifying column and direction, e.g., `[{"column": "name", "dir": "asc"}]`.
+  - `search` (string): The initial search string to filter the table data.
+  - `searchWait` (number): The debounce time in milliseconds for search input to wait after the last keystroke before performing the search.
+  - `listPerPage` (array): The list of options for the per-page dropdown, e.g., `[10, 25, 50, 100]`.
+  - `perPage` (number): The initial number of items per page.
+  - `cssTable` (string): The CSS classes to apply to the table. Default is `'table table-striped table-bordered table-responsive'`.
+  - `paginationPrevNext` (boolean): Whether to show the previous and next buttons in the pagination. Default is `true`.
+  - `paginationRange` (number): The number of pages to show on either side of the current page in the pagination. Default is `2`.
+- `language` (object): Language settings for the table.
+  - `showLabel` (string): The label for the per-page select.
+  - `entriesLabel` (string): The label next to the per-page select indicating what the numbers represent (e.g., "entries").
+  - `searchLabel` (string): The label for the search input.
+  - `previousLabel` (string): The label for the pagination's previous button.
+  - `nextLabel` (string): The label for the pagination's next button.
+  - `showingEntries` (function): A function to format the text showing the range of visible entries out of the total, e.g., `(start, end, total) => 'Showing ${start} to ${end} of ${total} entries'`.
+  - `showingFilteredEntries` (function): A function to format the text showing the range of visible entries out of the total when filtered, e.g., `(start, end, filtered, total) => 'Showing ${start} to ${end} of ${filtered} entries (filtered from ${total} total entries)'`.
+
+## Planned features
+
+While AvalynxDataTable is already a powerful tool for displaying and interacting with data in web applications, we are constantly working to improve and expand its capabilities. Here are some of the features we plan to implement in the future:
+
+- **Responsive Layout Transformation**: We plan to add the ability for data table rows to transform into a list layout on smaller devices. This feature will enhance the usability of AvalynxDataTable on mobile devices by providing a more accessible and user-friendly interface for displaying data.
+
+
+Stay tuned for updates, and feel free to contribute ideas or suggestions via our [GitHub repository](https://github.com/avalynx/avalynx-datatable).
+
+## Contributing
+
+Contributions are welcome! If you'd like to contribute, please fork the repository and submit a pull request with your changes or improvements. We're looking for contributions in the following areas:
+
+- Bug fixes
+- Feature enhancements
+- Documentation improvements
+
+Before submitting your pull request, please ensure your changes are well-documented and follow the existing coding style of the project.
+
+## License
+
+AvalynxDataTable is open-sourced software licensed under the [MIT license](LICENSE).
+
+## Contact
+
+If you have any questions, feature requests, or issues, please open an issue on our [GitHub repository](https://github.com/avalynx/avalynx-datatable/issues) or submit a pull request.
+
+Thank you for considering AvalynxDataTable for your project!

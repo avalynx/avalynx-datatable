@@ -1,0 +1,65 @@
+/**
+ * AvalynxDataTable
+ *
+ * A simple, lightweight, and customizable data table for the web. Based on Bootstrap >=5.3 without any framework dependencies.
+ *
+ * @version 0.0.1
+ * @license MIT
+ * @author https://github.com/avalynx/avalynx-datatable/graphs/contributors
+ * @website https://github.com/avalynx/
+ * @repository https://github.com/avalynx/avalynx-datatable.git
+ * @bugs https://github.com/avalynx/avalynx-datatable/issues
+ */
+
+.avalynx-datatable-table th.avalynx-datatable-sorting,
+.avalynx-datatable-table td.avalynx-datatable-sorting,
+.avalynx-datatable-table th.avalynx-datatable-sorting-,
+.avalynx-datatable-table td.avalynx-datatable-sorting-asc,
+.avalynx-datatable-table th.avalynx-datatable-sorting-desc,
+.avalynx-datatable-table td.avalynx-datatable-sorting-desc,
+.avalynx-datatable-table th.avalynx-datatable-sorting-asc_disabled,
+.avalynx-datatable-table td.avalynx-datatable-sorting-asc_disabled,
+.avalynx-datatable-table th.avalynx-datatable-sorting-desc_disabled,
+.avalynx-datatable-table td.avalynx-datatable-sorting-desc_disabled {
+    cursor: pointer;
+    padding-right: 1.625rem;
+    position: relative;
+}
+
+.avalynx-datatable-table th.avalynx-datatable-sorting:before,
+.avalynx-datatable-table th.avalynx-datatable-sorting:after,
+.avalynx-datatable-table td.avalynx-datatable-sorting:before,
+.avalynx-datatable-table td.avalynx-datatable-sorting:after {
+    font-size: 0.8em;
+    line-height: 0.5625rem;
+    opacity: .125;
+    position: absolute;
+    right: 0.625rem;
+}
+
+.avalynx-datatable-table th.avalynx-datatable-sorting:before,
+.avalynx-datatable-table td.avalynx-datatable-sorting:before,
+.avalynx-datatable-table th.avalynx-datatable-sorting-asc:before,
+.avalynx-datatable-table td.avalynx-datatable-sorting-asc:before,
+.avalynx-datatable-table th.avalynx-datatable-sorting-desc:before,
+.avalynx-datatable-table td.avalynx-datatable-sorting-desc:before {
+    bottom: 50%;
+    content: "▲";
+}
+
+.avalynx-datatable-table th.avalynx-datatable-sorting:after,
+.avalynx-datatable-table td.avalynx-datatable-sorting:after,
+.avalynx-datatable-table th.avalynx-datatable-sorting-asc:after,
+.avalynx-datatable-table td.avalynx-datatable-sorting-asc:after,
+.avalynx-datatable-table th.avalynx-datatable-sorting-desc:after,
+.avalynx-datatable-table td.avalynx-datatable-sorting-desc:after {
+    top: 50%;
+    content: "▼";
+}
+
+.avalynx-datatable-table th.avalynx-datatable-sorting-asc:before,
+.avalynx-datatable-table th.avalynx-datatable-sorting-desc:after,
+.avalynx-datatable-table td.avalynx-datatable-sorting-asc:before,
+.avalynx-datatable-table td.avalynx-datatable-sorting-desc:after {
+    opacity: .7;
+}
