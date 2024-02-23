@@ -16,7 +16,8 @@ AvalynxDataTable is a simple, lightweight, and customizable data table component
 Here's a simple example of how to use AvalynxDataTable in your project:
 
 * [Overview](https://avalynx-datatable.jbs-newmedia.de/examples/index.html)
-
+* [DataTable](https://avalynx-datatable.jbs-newmedia.de/examples/datatable.html)
+* [DataTable with slow response](https://avalynx-datatable.jbs-newmedia.de/examples/datatable-slow-response.html)
 
 ## Installation
 

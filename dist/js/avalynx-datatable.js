@@ -377,10 +377,10 @@ class AvalynxDataTable {
 		overlay.style.left = 0;
 		overlay.style.width = '100%';
 		overlay.style.height = '100%';
-		overlay.style.display = 'none'; // Standardmäßig versteckt
+		overlay.style.display = 'none';
 		overlay.style.alignItems = 'center';
 		overlay.style.justifyContent = 'center';
-		overlay.style.background = 'rgba(255, 255, 255, 0.7)';
+		overlay.style.backgroundColor = 'rgba(var(--bs-body-bg-rgb, 0, 0, 0), 0.7)';
 		overlay.style.zIndex = '1000';
 
 		const spinner = document.createElement('div');

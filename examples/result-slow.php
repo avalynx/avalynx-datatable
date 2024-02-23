@@ -109,4 +109,5 @@ $result['count']=[
 ];
 
 header('Content-Type: application/json');
+sleep(5); // Simulate slow response (5 seconds delay)
 echo json_encode($result);
