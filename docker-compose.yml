@@ -1,16 +1,21 @@
 version: "3.9"
 services:
-    web:
-        build: ./docker/web
-        working_dir: /app
-        user: application
-        ports:
-            - "80:80"
-            - "443:443"
-        volumes:
-            - ./:/app
-        tmpfs:
-          - /tmp:mode=1777
-        environment:
-          - WEB_DOCUMENT_ROOT=/app
-          - PHP_DISPLAY_ERRORS=1
+  web:
+    build: ./docker/web
+    working_dir: /app
+    user: application
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./:/app
+    tmpfs:
+      - /tmp:mode=1777
+    environment:
+      - WEB_DOCUMENT_ROOT=/app
+      - WEB_DOCUMENT_ROOT=/app
+      - PHP_DISPLAY_ERRORS=1
+      - PHP_MEMORY_LIMIT=512M
+      - PHP_MAX_EXECUTION_TIME=300
+      - PHP_POST_MAX_SIZE=100M
+      - PHP_UPLOAD_MAX_FILESIZE=100M
