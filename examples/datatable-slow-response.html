@@ -16,6 +16,9 @@
 	<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9/build/styles/stackoverflow-light.min.css" id="hljsTheme">
 	<script>hljs.highlightAll();</script>
 
+    <!-- AvalynxLoader 0.0.1 -->
+    <script src="../../avalynx-loader/dist/js/avalynx-loader.js"></script>
+
 	<!-- AvalynxDatatable 0.0.1 -->
 	<link href="../dist/css/avalynx-datatable.css" rel="stylesheet">
 	<script src="../dist/js/avalynx-datatable.js"></script>
@@ -44,13 +47,16 @@
 	<script>
 
 		new AvalynxDataTable("avalynx-datatable", {
-			apiUrl: "result-slow.php",
+			apiUrl: "php/result-slow.php",
 			perPage: 10,
 			search: "",
 			sorting: {
 				"name": "asc",
 				"age": "desc"
-			}
+			},
+            loader: new AvalynxLoader('#avalynx-datatable', {
+                className: 'spinner-border text-danger',
+            })
 		}, {
 			showLabel: "Zeige",
 			entriesLabel: "Einträge",

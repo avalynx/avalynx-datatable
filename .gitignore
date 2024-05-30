@@ -1,2 +1,4 @@
 /.idea/
-/examples/demo.db
+/node_modules/
+/examples/php/demo.db
+/examples/php/demo2.db

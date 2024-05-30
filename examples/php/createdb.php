@@ -78,3 +78,52 @@ try {
 } catch (PDOException $e) {
 	$success = false;
 }
+
+
+if ($success===true) {
+    try {
+        $pdo2 = new PDO('sqlite:demo2.db');
+
+        $result['data']=[
+            ['id'=>1, 'company'=>'Tiger Nixon Inc.', 'price'=>10000000],
+            ['id'=>2, 'company'=>'Garrett Winters Ltd.', 'price'=>20000000],
+            ['id'=>3, 'company'=>'Ashton Cox LLC', 'price'=>30000000],
+            ['id'=>4, 'company'=>'Cedric Kelly Co.', 'price'=>800000],
+            ['id'=>5, 'company'=>'Airi Satou GmbH', 'price'=>50000000],
+            ['id'=>6, 'company'=>'Brielle Williamson AG', 'price'=>60000000],
+            ['id'=>7, 'company'=>'Herrod Chandler Corp.', 'price'=>700000],
+            ['id'=>8, 'company'=>'Rhona Davidson Ltd.', 'price'=>80000000],
+            ['id'=>9, 'company'=>'Colleen Hurst Inc.', 'price'=>90000000],
+            ['id'=>10, 'company'=>'Sonya Frost GmbH', 'price'=>100000000],
+            ['id'=>11, 'company'=>'Jena \\ Gaines - AG', 'price'=>10000],
+            ['id'=>12, 'company'=>'Quinn Flynn LLC', 'price'=>120000000],
+            ['id'=>13, 'company'=>'Charde\'s Marshall Co.', 'price'=>13000],
+            ['id'=>14, 'company'=>'Haley Kennedy GmbH', 'price'=>140000],
+            ['id'=>15, 'company'=>'Tatyana Fitzpatrick AG', 'price'=>150000000],
+            ['id'=>16, 'company'=>'Michael Silva Corp.', 'price'=>160000000],
+            ['id'=>17, 'company'=>'Paul Byrd Ltd.', 'price'=>170000000],
+            ['id'=>18, 'company'=>'Gloria "Little" Inc.', 'price'=>8000],
+            ['id'=>19, 'company'=>'Bradley Greer GmbH', 'price'=>190000000],
+            ['id'=>20, 'company'=>'Dai Rios AG', 'price'=>200000],
+            ['id'=>21, 'company'=>'Jenette Caldwell LLC', 'price'=>2010000000],
+            ['id'=>22, 'company'=>'Yuri Berry Co.', 'price'=>2000000],
+            ['id'=>23, 'company'=>'Caesar Vance Ltd.', 'price'=>20050000],
+            ['id'=>24, 'company'=>'Doris Wilder GmbH', 'price'=>24000000],
+        ];
+        $stmt = $pdo2->prepare("DROP TABLE IF EXISTS company");
+        $stmt->execute();
+
+        $stmt = $pdo2->prepare("CREATE TABLE company (id INTEGER PRIMARY KEY, company TEXT, price int)");
+        $stmt->execute();
+
+        $stmt = $pdo2->prepare("INSERT INTO company (id, company, price) VALUES (:id, :company, :price)");
+
+        foreach ($result['data'] as $row) {
+            $stmt->execute($row);
+        }
+
+        $success = true;
+    } catch (PDOException $e) {
+        $success = false;
+    }
+}
