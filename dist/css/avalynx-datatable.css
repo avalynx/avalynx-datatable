@@ -3,7 +3,7 @@
  *
  * A simple, lightweight, and customizable data table for the web. Based on Bootstrap >=5.3 without any framework dependencies.
  *
- * @version 0.0.1
+ * @version 0.0.2
  * @license MIT
  * @author https://github.com/avalynx/avalynx-datatable/graphs/contributors
  * @website https://github.com/avalynx/

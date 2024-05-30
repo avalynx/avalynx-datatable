@@ -2,7 +2,7 @@
   "name": "avalynx-datatable",
   "title": "AvalynxDataTable",
   "description": "AvalynxDatatable is a simple, lightweight, and customizable datatable for the web. Based on Bootstrap >=5.3 without any framework dependencies.",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "license": "MIT",
   "main": "dist/js/avalynx-datatable.js",
   "module": "dist/js/avalynx-datatable.esm.js",
