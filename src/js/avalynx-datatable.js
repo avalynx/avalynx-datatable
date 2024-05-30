@@ -13,7 +13,7 @@
  * @param {string} id - The ID of the element to attach the table to.
  * @param {object} options - An object containing the following keys:
  * @param {string} options.apiUrl - The URL to fetch the data from (default: null).
- * @param {object} options.apiMethod - The HTTP method to use when fetching data from the API (default: 'POST').
+ * @param {string} options.apiMethod - The HTTP method to use when fetching data from the API (default: 'POST').
  * @param {object} options.apiParams - Additional parameters to send with the API request (default: {}).
  * @param {object} options.sorting - The initial sorting configuration for the table. Format is an array of objects specifying column and direction, e.g., [{"column": "name", "dir": "asc"}] (default: []).
  * @param {number} options.currentPage - The initial page number to display (default: 1).
