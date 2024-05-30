@@ -17,8 +17,8 @@ Here's a simple example of how to use AvalynxDataTable in your project:
 
 * [Overview](https://avalynx-datatable.jbs-newmedia.de/examples/index.html)
 * [DataTable](https://avalynx-datatable.jbs-newmedia.de/examples/datatable.html)
-* [MDB DataTable](https://avalynx-datatable.jbs-newmedia.de/examples/mdb-datatable.html)
 * [DataTable with slow response](https://avalynx-datatable.jbs-newmedia.de/examples/datatable-slow-response.html)
+* [DataTable multiple instances](https://avalynx-datatable.jbs-newmedia.de/examples/datatable-multiple-instances.html)
 
 ## Installation
 
@@ -117,24 +117,28 @@ new AvalynxDataTable("avalynx-datatable", {
 AvalynxDataTable allows the following options for customization:
 
 - `id` (string): The ID of the element to attach the table to.
-- `options` (object): Configuration options for the table.
-  - `apiUrl` (string): URL to fetch the data from.
-  - `sorting` (object): The initial sorting configuration for the table. Format is an array of objects specifying column and direction, e.g., `[{"column": "name", "dir": "asc"}]`.
-  - `search` (string): The initial search string to filter the table data.
-  - `searchWait` (number): The debounce time in milliseconds for search input to wait after the last keystroke before performing the search.
-  - `listPerPage` (array): The list of options for the per-page dropdown, e.g., `[10, 25, 50, 100]`.
-  - `perPage` (number): The initial number of items per page.
-  - `cssTable` (string): The CSS classes to apply to the table. Default is `'table table-striped table-bordered table-responsive'`.
-  - `paginationPrevNext` (boolean): Whether to show the previous and next buttons in the pagination. Default is `true`.
-  - `paginationRange` (number): The number of pages to show on either side of the current page in the pagination. Default is `2`.
-- `language` (object): Language settings for the table.
-  - `showLabel` (string): The label for the per-page select.
-  - `entriesLabel` (string): The label next to the per-page select indicating what the numbers represent (e.g., "entries").
-  - `searchLabel` (string): The label for the search input.
-  - `previousLabel` (string): The label for the pagination's previous button.
-  - `nextLabel` (string): The label for the pagination's next button.
-  - `showingEntries` (function): A function to format the text showing the range of visible entries out of the total, e.g., `(start, end, total) => 'Showing ${start} to ${end} of ${total} entries'`.
-  - `showingFilteredEntries` (function): A function to format the text showing the range of visible entries out of the total when filtered, e.g., `(start, end, filtered, total) => 'Showing ${start} to ${end} of ${filtered} entries (filtered from ${total} total entries)'`.
+- `options` (object): An object containing the following keys:
+  - `apiUrl` (string): URL to fetch the data from (default: `null`).
+  - `apiMethod` (string): The HTTP method to use when fetching data from the API (default: `'POST'`).
+  - `apiParams` (object): Additional parameters to send with the API request (default: `{}`).
+  - `sorting` (object): The initial sorting configuration for the table. Format is an array of objects specifying column and direction, e.g., `[{"column": "name", "dir": "asc"}]` (default: `[]`).
+  - `currentPage` (number): The initial page number to display (default: `1`).
+  - `search` (string): The initial search string to filter the table data (default: `''`).
+  - `searchWait` (number): The debounce time in milliseconds for search input to wait after the last keystroke before performing the search (default: `800`).
+  - `listPerPage` (array): The list of options for the per-page dropdown (default: `[10, 25, 50, 100]`).
+  - `perPage` (number): The initial number of items per page (default: `10`).
+  - `className` (string): The CSS classes to apply to the table (default: `'table table-striped table-bordered table-responsive'`).
+  - `paginationPrevNext` (boolean): Whether to show the previous and next buttons in the pagination (default: `true`).
+  - `paginationRange` (number): The number of pages to show on either side of the current page in the pagination (default: `2`).
+  - `loader` (object): An instance of AvalynxLoader to use as the loader for the table (default: `null`).  
+- `language` (object): An object containing the following keys:
+  - `showLabel` (string): The label for the per-page select (default: `'Show'`)
+  - `entriesLabel` (string): The label next to the per-page select indicating what the numbers represent (default: `'entries'`)
+  - `searchLabel` (string): The label for the search input (default: `'Search'`).
+  - `previousLabel` (string): The label for the pagination's previous button (default: `'Previous'`).
+  - `nextLabel` (string): The label for the pagination's next button (default: `'Next'`).
+  - `showingEntries` (function): A function to format the text showing the range of visible entries out of the total (default: `(start, end, total) => 'Showing ${start} to ${end} of ${total} entries'`).
+  - `showingFilteredEntries` (function): A function to format the text showing the range of visible entries out of the total when filtered (default: `(start, end, filtered, total) => 'Showing ${start} to ${end} of ${filtered} entries (filtered from ${total} entries)'`).
 
 ## Planned features
 

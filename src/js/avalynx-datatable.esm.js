@@ -10,25 +10,30 @@
  * @repository https://github.com/avalynx/avalynx-datatable.git
  * @bugs https://github.com/avalynx/avalynx-datatable/issues
  *
- * @param {string} id - The id of the element to attach the table to
- * @param {object} options - The options for the table
- * @param {string} options.apiUrl - The URL to fetch the data from
- * @param {object} options.sorting - The initial sorting of the table
- * @param {string} options.search - The initial search string
- * @param {number} options.searchWait - The time to wait after the last key stroke before searching
- * @param {array} options.listPerPage - The list of options for the per page select
- * @param {number} options.perPage - The initial per page value
- * @param {string} options.cssTable - The CSS classes to apply to the table
- * @param {boolean} options.paginationPrevNext - Whether to show the previous and next buttons in the pagination
- * @param {number} options.paginationRange - The number of pages to show on either side of the current page in the pagination
- * @param {object} language - The language settings for the table
- * @param {string} language.showLabel - The label for the per page select
- * @param {string} language.entriesLabel - The label for the per page select
- * @param {string} language.searchLabel - The label for the search input
- * @param {string} language.previousLabel - The label for the previous button in the pagination
- * @param {string} language.nextLabel - The label for the next button in the pagination
- * @param {function} language.showingEntries - The function to format the entries label
- * @param {function} language.showingFilteredEntries - The function to format the entries label when filtered
+ * @param {string} id - The ID of the element to attach the table to.
+ * @param {object} options - An object containing the following keys:
+ * @param {string} options.apiUrl - The URL to fetch the data from (default: null).
+ * @param {object} options.apiMethod - The HTTP method to use when fetching data from the API (default: 'POST').
+ * @param {object} options.apiParams - Additional parameters to send with the API request (default: {}).
+ * @param {object} options.sorting - The initial sorting configuration for the table. Format is an array of objects specifying column and direction, e.g., [{"column": "name", "dir": "asc"}] (default: []).
+ * @param {number} options.currentPage - The initial page number to display (default: 1).
+ * @param {string} options.search - The initial search string to filter the table data (default: '').
+ * @param {number} options.searchWait - The debounce time in milliseconds for search input to wait after the last keystroke before performing the search (default: 800).
+ * @param {array} options.listPerPage - The list of options for the per-page dropdown (default: [10, 25, 50, 100]).
+ * @param {number} options.perPage - The initial number of items per page (default: 10).
+ * @param {string} options.className - The CSS classes to apply to the table (default: 'table table-striped table-bordered table-responsive').
+ * @param {boolean} options.paginationPrevNext - Whether to show the previous and next buttons in the pagination (default: true).
+ * @param {number} options.paginationRange - The number of pages to show on either side of the current page in the pagination (default: 2).
+ * @param {object} options.loader - An instance of AvalynxLoader to use as the loader for the table (default: null).
+ * @param {object} language - An object containing the following keys:
+ * @param {string} language.showLabel - The label for the per-page select (default: 'Show').
+ * @param {string} language.entriesLabel - The label next to the per-page select indicating what the numbers represent (default: 'entries').
+ * @param {string} language.searchLabel - The label for the search input (default: 'Search').
+ * @param {string} language.previousLabel - The label for the pagination's previous button (default: 'Previous').
+ * @param {string} language.nextLabel - The label for the pagination's next button (default: 'Next').
+ * @param {function} language.showingEntries - A function to format the text showing the range of visible entries out of the total (default: (start, end, total) => 'Showing ${start} to ${end} of ${total} entries').
+ * @param {function} language.showingFilteredEntries - A function to format the text showing the range of visible entries out of the total when filtered (default: (start, end, filtered, total) => 'Showing ${start} to ${end} of ${filtered} entries (filtered from ${total} entries)').
+ *
  */
 
 export class AvalynxDataTable {
@@ -39,33 +44,36 @@ export class AvalynxDataTable {
             return;
         }
         this.id = id;
-        this.currentPage = 1;
-        this.apiUrl = options.apiUrl || '';
-        this.sorting = options.sorting || [];
-        this.search = options.search || '';
-        this.searchWait = options.searchWait || 800;
-        this.listPerPage = options.listPerPage || [10, 25, 50, 100];
-        this.perPage = options.perPage || 10;
-        this.cssTable = options.cssTable || 'table table-striped table-bordered table-responsive';
-        this.paginationPrevNext = options.paginationPrevNext || true;
-        this.paginationRange = options.paginationRange || 2;
-        if (!this.listPerPage.includes(options.perPage)) {
-            this.perPage = 10;
+        this.options = {
+            apiUrl: '',
+            apiMethod: 'POST',
+            apiParams: {},
+            sorting: [],
+            currentPage: 1,
+            search: '',
+            searchWait: 800,
+            listPerPage: [10, 25, 50, 100],
+            perPage: 10,
+            className: 'table table-striped table-bordered table-responsive',
+            paginationPrevNext: true,
+            paginationRange: 2,
+            loader: null,
+            ...options
         }
-        this.searchIsNew = false;
-
-        this.defaultLanguage = {
+        this.language = {
             showLabel: "Show",
             entriesLabel: "entries",
             searchLabel: "Search",
             previousLabel: "Previous",
             nextLabel: "Next",
             showingEntries: (start, end, total) => `Showing ${start} to ${end} of ${total} entries`,
-            showingFilteredEntries: (start, end, filtered, total) => `Showing ${start} to ${end} of ${filtered} entries (filtered from ${total} total entries)`
-        };
-
-        this.language = {...this.defaultLanguage, ...language};
-
+            showingFilteredEntries: (start, end, filtered, total) => `Showing ${start} to ${end} of ${filtered} entries (filtered from ${total} total entries)`,
+            ...language
+        }
+        if (!this.options.listPerPage.includes(options.perPage)) {
+            this.options.perPage = 10;
+        }
+        this.options.searchIsNew = false;
         this.init();
         this.fetchData();
     }
@@ -77,7 +85,7 @@ export class AvalynxDataTable {
         const template_avalynx_datatable_table = document.getElementById("avalynx-datatable-table").content.cloneNode(true);
         const template_avalynx_datatable_bottom = document.getElementById("avalynx-datatable-bottom").content.cloneNode(true);
 
-        template_avalynx_datatable_table.querySelector("table").className = this.cssTable + ' avalynx-datatable-table';
+        template_avalynx_datatable_table.querySelector("table").className = this.options.className + ' avalynx-datatable-table';
 
         template_avalynx_datatable_top.querySelector(".avalynx-datatable-top-entries label:first-child").textContent = this.language.showLabel;
         template_avalynx_datatable_top.querySelector(".avalynx-datatable-top-entries label:last-child").textContent = this.language.entriesLabel;
@@ -94,28 +102,43 @@ export class AvalynxDataTable {
     }
 
     async fetchData() {
-        const overlay = document.getElementById(`${this.id}-overlay`);
-        overlay.style.display = 'flex';
+        if (this.options.loader === null) {
+            const overlay = document.getElementById(`${this.id}-overlay`);
+            overlay.style.display = 'flex';
+        } else {
+            this.options.loader.load=true;
+        }
 
         try {
             const postData = {
-                "search": this.search,
-                "sorting": this.sorting,
-                "page": this.currentPage,
-                "perpage": this.perPage,
-                "searchisnew": (this.searchIsNew === true) ? 1 : 0,
+                "search": this.options.search,
+                "sorting": this.options.sorting,
+                "page": this.options.currentPage,
+                "perpage": this.options.perPage,
+                "searchisnew": (this.options.searchIsNew === true) ? 1 : 0,
+                ...this.options.apiParams
             };
             postData.sorting = JSON.stringify(postData.sorting);
-            const formBody = Object.keys(postData).map(key => {
-                return encodeURIComponent(key) + '=' + encodeURIComponent(postData[key]);
-            }).join('&');
-            const response = await fetch(this.apiUrl, {
-                method: 'POST',
+
+            let url = this.options.apiUrl;
+            let fetchOptions = {
+                method: this.options.apiMethod,
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded',
-                },
-                body: formBody
-            });
+                }
+            };
+
+            if (this.options.apiMethod === 'GET') {
+                const queryParams = new URLSearchParams(postData).toString();
+                url += '?' + queryParams;
+            } else {
+                const formBody = Object.keys(postData).map(key => {
+                    return encodeURIComponent(key) + '=' + encodeURIComponent(postData[key]);
+                }).join('&');
+                fetchOptions.body = formBody;
+            }
+
+            const response = await fetch(url, fetchOptions);
             const data = await response.json();
             if (data.error) {
                 alert(data.error);
@@ -123,23 +146,30 @@ export class AvalynxDataTable {
                 return;
             }
             this.result = data;
-            this.searchIsNew = false;
-            this.currentPage = this.result.count.page;
-            if (this.perPage !== this.result.count.perpage) {
-                this.perPage = this.result.count.perpage;
+            this.options.searchIsNew = false;
+            this.options.currentPage = this.result.count.page;
+            if (this.options.perPage !== this.result.count.perpage) {
+                this.options.perPage = this.result.count.perpage;
                 this.populatePerPageOptions();
             }
             this.totalPages = Math.ceil(this.result.count.filtered / this.result.count.perpage);
             this.populateTable();
-            if (this.sorting !== this.result.sorting) {
-                this.sorting = this.result.sorting;
+            if (this.options.sorting !== this.result.sorting) {
+                this.options.sorting = this.result.sorting;
                 this.updateSortingIcons();
             }
         } catch (error) {
             alert(error);
             console.error('Error:', error);
         } finally {
-            overlay.style.display = 'none';
+            if (this.options.loader === null) {
+                const overlay = document.getElementById(`${this.id}-overlay`);
+                if (overlay) {
+                    overlay.style.display = 'none';
+                }
+            } else {
+                this.options.loader.load = false;
+            }
         }
     }
 
@@ -191,19 +221,19 @@ export class AvalynxDataTable {
     setupPerPageChangeEvent() {
         const select = this.dt.querySelector(".avalynx-datatable-top .avalynx-datatable-top-entries .form-select");
         select.addEventListener('change', (event) => {
-            this.perPage = parseInt(event.target.value);
-            this.fetchData(this.currentPage);
+            this.options.perPage = parseInt(event.target.value);
+            this.fetchData(this.options.currentPage);
         });
     }
 
     populatePerPageOptions() {
         const select = this.dt.querySelector(".avalynx-datatable-top .avalynx-datatable-top-entries .form-select");
         select.innerHTML = '';
-        this.listPerPage.forEach((num) => {
+        this.options.listPerPage.forEach((num) => {
             const option = document.createElement("option");
             option.value = num;
             option.textContent = num;
-            if (num === this.perPage) {
+            if (num === this.options.perPage) {
                 option.selected = true;
             }
             select.appendChild(option);
@@ -217,18 +247,18 @@ export class AvalynxDataTable {
         searchInput.addEventListener('input', (event) => {
             clearTimeout(debounceTimeout);
             debounceTimeout = setTimeout(() => {
-                if (event.target.value !== this.search) {
-                    this.searchIsNew = true;
+                if (event.target.value !== this.options.search) {
+                    this.options.searchIsNew = true;
                 }
-                this.search = event.target.value;
-                this.fetchData(this.currentPage);
-            }, this.searchWait);
+                this.options.search = event.target.value;
+                this.fetchData(this.options.currentPage);
+            }, this.options.searchWait);
         });
     }
 
     populateSearchInput() {
         const searchInput = this.dt.querySelector(".avalynx-datatable-top .avalynx-datatable-top-search .form-control");
-        searchInput.value = this.search;
+        searchInput.value = this.options.search;
     }
 
     populateTable() {
@@ -277,19 +307,19 @@ export class AvalynxDataTable {
                 if (!columnId) return;
                 const isCtrlPressed = event.ctrlKey;
                 const isShiftPressed = event.shiftKey;
-                if (this.sorting[columnId]) {
-                    let sort = this.sorting[columnId] === 'asc' ? 'desc' : 'asc';
+                if (this.options.sorting[columnId]) {
+                    let sort = this.options.sorting[columnId] === 'asc' ? 'desc' : 'asc';
                     if (!isCtrlPressed && !isShiftPressed) {
-                        this.sorting = {};
+                        this.options.sorting = {};
                     } else {
-                        delete this.sorting[columnId];
+                        delete this.options.sorting[columnId];
                     }
-                    this.sorting[columnId] = sort;
+                    this.options.sorting[columnId] = sort;
                 } else {
                     if (!isCtrlPressed && !isShiftPressed) {
-                        this.sorting = {};
+                        this.options.sorting = {};
                     }
-                    this.sorting[columnId] = 'asc';
+                    this.options.sorting[columnId] = 'asc';
                 }
                 this.fetchData();
             });
@@ -301,8 +331,8 @@ export class AvalynxDataTable {
         sortableHeaders.forEach(header => {
             const columnId = header.getAttribute('data-avalynx-datatable-column-id');
             if (!columnId) return;
-            if (this.sorting[columnId]) {
-                if (this.sorting[columnId] === 'asc') {
+            if (this.options.sorting[columnId]) {
+                if (this.options.sorting[columnId] === 'asc') {
                     header.classList.add('avalynx-datatable-sorting-asc');
                     header.classList.remove('avalynx-datatable-sorting-desc');
                 } else {
@@ -333,27 +363,27 @@ export class AvalynxDataTable {
         const paginationUl = this.dt.querySelector(".avalynx-datatable-bottom-pagination ul");
         paginationUl.innerHTML = '';
 
-        const prevDisabled = this.currentPage === 1;
-        if (this.paginationPrevNext) {
-            this.addPaginationItem(paginationUl, this.currentPage - 1, this.language.previousLabel, prevDisabled);
+        const prevDisabled = this.options.currentPage === 1;
+        if (this.options.paginationPrevNext) {
+            this.addPaginationItem(paginationUl, this.options.currentPage - 1, this.language.previousLabel, prevDisabled);
         }
 
-        let startPage = Math.max(1, this.currentPage - this.paginationRange);
-        let endPage = Math.min(this.currentPage + this.paginationRange, this.totalPages);
+        let startPage = Math.max(1, this.options.currentPage - this.options.paginationRange);
+        let endPage = Math.min(this.options.currentPage + this.options.paginationRange, this.totalPages);
 
         for (let i = startPage; i <= endPage; i++) {
             this.addPaginationItem(paginationUl, i, i, false);
         }
 
-        const nextDisabled = this.currentPage === this.totalPages;
-        if (this.paginationPrevNext) {
-            this.addPaginationItem(paginationUl, this.currentPage + 1, this.language.nextLabel, nextDisabled);
+        const nextDisabled = this.options.currentPage === this.totalPages;
+        if (this.options.paginationPrevNext) {
+            this.addPaginationItem(paginationUl, this.options.currentPage + 1, this.language.nextLabel, nextDisabled);
         }
     }
 
     addPaginationItem(paginationUl, pageNumber, text = pageNumber, disabled = false) {
         const li = document.createElement("li");
-        li.className = "page-item" + (pageNumber === this.currentPage ? " active" : "") + (disabled ? " disabled" : "");
+        li.className = "page-item" + (pageNumber === this.options.currentPage ? " active" : "") + (disabled ? " disabled" : "");
         const a = document.createElement("a");
         a.className = "page-link";
         a.href = "#";
@@ -361,7 +391,7 @@ export class AvalynxDataTable {
         if (!disabled) {
             a.addEventListener('click', (e) => {
                 e.preventDefault();
-                this.currentPage = pageNumber;
+                this.options.currentPage = pageNumber;
                 this.fetchData();
             });
         }
@@ -370,26 +400,28 @@ export class AvalynxDataTable {
     }
 
     setupOverlayAndLoader() {
-        const overlay = document.createElement('div');
-        overlay.id = `${this.id}-overlay`;
-        overlay.style.position = 'absolute';
-        overlay.style.top = 0;
-        overlay.style.left = 0;
-        overlay.style.width = '100%';
-        overlay.style.height = '100%';
-        overlay.style.display = 'none';
-        overlay.style.alignItems = 'center';
-        overlay.style.justifyContent = 'center';
-        overlay.style.backgroundColor = 'rgba(var(--bs-body-bg-rgb, 0, 0, 0), 0.7)';
-        overlay.style.zIndex = '1000';
+        if (this.options.loader === null) {
+            const overlay = document.createElement('div');
+            overlay.id = `${this.id}-overlay`;
+            overlay.style.position = 'absolute';
+            overlay.style.top = 0;
+            overlay.style.left = 0;
+            overlay.style.width = '100%';
+            overlay.style.height = '100%';
+            overlay.style.display = 'none';
+            overlay.style.alignItems = 'center';
+            overlay.style.justifyContent = 'center';
+            overlay.style.backgroundColor = 'rgba(var(--bs-body-bg-rgb, 0, 0, 0), 0.7)';
+            overlay.style.zIndex = '1000';
 
-        const spinner = document.createElement('div');
-        spinner.className = 'spinner-border text-primary';
-        spinner.role = 'status';
-        spinner.innerHTML = '<span class="visually-hidden">Loading...</span>';
+            const spinner = document.createElement('div');
+            spinner.className = 'spinner-border text-primary';
+            spinner.role = 'status';
+            spinner.innerHTML = '<span class="visually-hidden">Loading...</span>';
 
-        overlay.appendChild(spinner);
-        this.dt.style.position = 'relative';
-        this.dt.appendChild(overlay);
+            overlay.appendChild(spinner);
+            this.dt.style.position = 'relative';
+            this.dt.appendChild(overlay);
+        }
     }
 }
