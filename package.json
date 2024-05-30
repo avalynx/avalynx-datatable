@@ -37,7 +37,7 @@
   "homepage": "https://github.com/avalynx/",
   "repository": {
     "type": "git",
-    "url": "https://github.com/avalynx/avalynx-datatable.git"
+    "url": "git+https://github.com/avalynx/avalynx-datatable.git"
   },
   "bugs": {
     "url": "https://github.com/avalynx/avalynx-datatable/issues"
