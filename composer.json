@@ -1,6 +1,6 @@
 {
     "name": "avalynx/avalynx-datatable",
-    "description": "AvalynxDatatable is a simple, lightweight, and customizable datatable for the web. Based on Bootstrap >=5.3 without any framework dependencies.",
+    "description": "AvalynxDataTable is a simple, lightweight, and customizable datatable for the web. Based on Bootstrap >=5.3 without any framework dependencies.",
     "keywords": [
         "avalynx",
         "datatable",
@@ -17,7 +17,7 @@
     "license": "MIT",
     "authors": [
         {
-            "name": "Juergen Schwind an the Avalynx-Datatable authors",
+            "name": "Juergen Schwind an the Avalynx-DataTable authors",
             "homepage": "https://github.com/avalynx/avalynx-datatable/graphs/contributors"
         }
     ],

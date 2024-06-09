@@ -1,4 +1,4 @@
-# AvalynxDatatable Changelog
+# AvalynxDataTable Changelog
 
 ## 0.0.2
 - [x] changed: options.cssTable to options.className
