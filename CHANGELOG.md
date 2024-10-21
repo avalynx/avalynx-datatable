@@ -1,5 +1,9 @@
 # AvalynxDataTable Changelog
 
+## 0.0.3
+- [x] added: css for options in th/td
+- [x] added: classes in result for th/td
+
 ## 0.0.2
 - [x] changed: options.cssTable to options.className
 - [x] added: options.apiMethod (string): The HTTP method to use when fetching data from the API (default: 'POST').
