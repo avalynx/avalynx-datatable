@@ -54,7 +54,7 @@ class AvalynxDataTable {
             searchWait: 800,
             listPerPage: [10, 25, 50, 100],
             perPage: 10,
-            className: 'table table-striped table-bordered table-responsive',
+            className: 'table table-striped table-bordered table-responsive align-middle',
             paginationPrevNext: true,
             paginationRange: 2,
             loader: null,
@@ -270,6 +270,9 @@ class AvalynxDataTable {
             if (column.hidden) {
                 th.classList.add("d-none");
             }
+            if (column.class) {
+                th.classList.add(column.class);
+            }
             th.textContent = column.name;
             th.setAttribute("data-avalynx-datatable-column-id", column.id);
             if (column.sortable) {
@@ -284,13 +287,27 @@ class AvalynxDataTable {
         tbody.innerHTML = '';
         this.result.data.forEach((rowData) => {
             const tr = document.createElement("tr");
+            if (rowData.class) {
+                tr.classList.add(rowData.class);
+            }
             this.result.head.columns.forEach((column) => {
                 const td = document.createElement("td");
                 if (column.hidden) {
                     td.classList.add("d-none");
                 }
-                td.textContent = rowData.data[column.id];
-                tr.appendChild(td);
+                if (column.class) {
+                    td.classList.add(column.class);
+                }
+                if (rowData.data_class && rowData.data_class[column.id]) {
+                    td.classList.add(rowData.data_class[column.id]);
+                }
+                if (column.raw) {
+                    tr.appendChild(td);
+                    td.innerHTML = rowData.data[column.id];
+                } else {
+                    td.textContent = rowData.data[column.id];
+                    tr.appendChild(td);
+                }
             });
             tbody.appendChild(tr);
         });
