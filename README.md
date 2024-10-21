@@ -46,8 +46,8 @@ Replace `path/to/avalynx-datatable.js` and `path/to/avalynx-datatable.css` with 
 AvalynxDataTable is also available via [jsDelivr](https://www.jsdelivr.com/). You can include it in your project like this:
 
 ```html
-<link href="https://cdn.jsdelivr.net/npm/avalynx-datatable@0.0.2/dist/css/avalynx-datatable.min.css" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/avalynx-datatable@0.0.2/dist/js/avalynx-datatable.min.js"></script>
+<link href="https://cdn.jsdelivr.net/npm/avalynx-datatable@0.0.3/dist/css/avalynx-datatable.min.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/avalynx-datatable@0.0.3/dist/js/avalynx-datatable.min.js"></script>
 ```
 
 Make sure to also include Bootstrap's JS/CSS in your project to ensure AvalynxDataTable displays correctly.
@@ -128,6 +128,94 @@ new AvalynxDataTable("avalynx-datatable", {
   showingFilteredEntries: (start, end, filtered, total) => `Zeige ${start} bis ${end} von ${filtered} Einträgen (gefiltert von ${total} Einträgen)`
 });
 ```
+
+## JSON Data Structure
+
+AvalynxDataTable expects data in a specific JSON format to render the table correctly. The JSON object should contain the following fields:
+
+```json
+{
+    "head": {
+        "columns": [
+            {"name": "Name", "sortable": true, "id": "name"},
+            {"name": "ID", "sortable": true, "id": "id", "hidden": true},
+            {"name": "Age", "id": "age"},
+            {"name": "City", "sortable": true, "id": "city"},
+            {"name": "Options", "raw": true, "id": "options", "class": "avalynx-datatable-options"}
+        ]
+    },
+    "data": [
+        {
+            "data": {
+                "id": 1,
+                "name": "Tiger Nixon",
+                "age": 61,
+                "city": "Edinburgh",
+                "options": "<a class='btn btn-sm btn-primary'>Edit</a>"
+            },
+            "config": {"test": "test_text"},
+            "class": "table-danger"
+        },
+        {
+            "data": {
+                "id": 2,
+                "name": "Garrett Winters",
+                "age": 63,
+                "city": "Tokyo",
+                "options": "<a class='btn btn-sm btn-primary'>Edit</a>"
+            },
+            "config": {"test": "test_text"},
+            "class": "",
+            "data_class": {"options": "table-danger"}
+        }
+        // Additional data ...
+    ],
+    "count": {
+        "total": 57,
+        "filtered": 57,
+        "start": 1,
+        "end": 10,
+        "perpage": 10,
+        "page": 1
+    },
+    "sorting": {
+        "name": "asc",
+        "age": "desc"
+    },
+    "search": {
+        "value": ""
+    }
+}
+
+```
+
+- **head.columns**: Defines the table columns and their properties like `sortable` (whether the column can be sorted) or `hidden` (whether the column is hidden).
+
+    - **name**: The display name of the column.
+    - **sortable**: A boolean that specifies whether the column is sortable.
+    - **id**: The internal identifier for the column used in sorting and data binding.
+    - **hidden**: (optional) Indicates if the column is hidden by default.
+    - **raw**: (optional) Specifies that the content of the column is raw HTML.
+    - **class**: (optional) CSS class for the column, which can be used for styling.
+
+- **data**: Contains the actual data that is displayed in the table. Each entry (row) contains the following:
+    - **data**: An object with the actual row values, such as `id`, `name`, `age`, `city`, and an `options` field that contains HTML for action buttons.
+    - **config**: (optional) Additional configuration that can be used to customize the row behavior.
+    - **class**: (optional) CSS class applied to the entire row.
+    - **data_class**: (optional) CSS classes for specific columns in the row.
+
+- **count**: Contains metadata about the result set:
+    - **total**: The total number of records in the database.
+    - **filtered**: The number of records after filtering (e.g., based on search input).
+    - **start**: The index of the first record on the current page.
+    - **end**: The index of the last record on the current page.
+    - **perpage**: The number of records per page (pagination size).
+    - **page**: The current page number.
+
+- **sorting**: Defines the current sorting configuration, where the key is the column ID and the value is the sorting direction (`asc` or `desc`).
+
+- **search**: Represents the current search filter applied to the data. It contains:
+    - **value**: The search query string used to filter the table data.
 
 ## Options
 

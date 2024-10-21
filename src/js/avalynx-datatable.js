@@ -3,7 +3,7 @@
  *
  * A simple, lightweight, and customizable data table for the web. Based on Bootstrap >=5.3 without any framework dependencies.
  *
- * @version 0.0.2
+ * @version 0.0.3
  * @license MIT
  * @author https://github.com/avalynx/avalynx-datatable/graphs/contributors
  * @website https://github.com/avalynx/
@@ -40,7 +40,7 @@ class AvalynxDataTable {
     constructor(id, options = {}, language = {}) {
         this.dt = document.getElementById(id);
         if (this.dt === null) {
-            console.error("AvalynxDataTable: Element with id '" + id + "' not found");
+            console.error(`AvalynxDataTable: Element with id '${id}' not found`);
             return;
         }
         this.id = id;
@@ -54,12 +54,12 @@ class AvalynxDataTable {
             searchWait: 800,
             listPerPage: [10, 25, 50, 100],
             perPage: 10,
-            className: 'table table-striped table-bordered table-responsive',
+            className: 'table table-striped table-bordered table-responsive align-middle',
             paginationPrevNext: true,
             paginationRange: 2,
             loader: null,
             ...options
-        }
+        };
         this.language = {
             showLabel: "Show",
             entriesLabel: "entries",
@@ -69,11 +69,13 @@ class AvalynxDataTable {
             showingEntries: (start, end, total) => `Showing ${start} to ${end} of ${total} entries`,
             showingFilteredEntries: (start, end, filtered, total) => `Showing ${start} to ${end} of ${filtered} entries (filtered from ${total} total entries)`,
             ...language
-        }
-        if (!this.options.listPerPage.includes(options.perPage)) {
+        };
+        if (!this.options.listPerPage.includes(this.options.perPage)) {
             this.options.perPage = 10;
         }
         this.options.searchIsNew = false;
+        this.result = null;
+        this.totalPages = 0;
         this.init();
         this.fetchData();
     }
@@ -270,6 +272,9 @@ class AvalynxDataTable {
             if (column.hidden) {
                 th.classList.add("d-none");
             }
+            if (column.class) {
+                th.classList.add(column.class);
+            }
             th.textContent = column.name;
             th.setAttribute("data-avalynx-datatable-column-id", column.id);
             if (column.sortable) {
@@ -284,13 +289,27 @@ class AvalynxDataTable {
         tbody.innerHTML = '';
         this.result.data.forEach((rowData) => {
             const tr = document.createElement("tr");
+            if (rowData.class) {
+                tr.classList.add(rowData.class);
+            }
             this.result.head.columns.forEach((column) => {
                 const td = document.createElement("td");
                 if (column.hidden) {
                     td.classList.add("d-none");
                 }
-                td.textContent = rowData.data[column.id];
-                tr.appendChild(td);
+                if (column.class) {
+                    td.classList.add(column.class);
+                }
+                if (rowData.data_class && rowData.data_class[column.id]) {
+                    td.classList.add(rowData.data_class[column.id]);
+                }
+                if (column.raw) {
+                    tr.appendChild(td);
+                    td.innerHTML = rowData.data[column.id];
+                } else {
+                    td.textContent = rowData.data[column.id];
+                    tr.appendChild(td);
+                }
             });
             tbody.appendChild(tr);
         });

@@ -3,7 +3,7 @@
  *
  * A simple, lightweight, and customizable data table for the web. Based on Bootstrap >=5.3 without any framework dependencies.
  *
- * @version 0.0.2
+ * @version 0.0.3
  * @license MIT
  * @author https://github.com/avalynx/avalynx-datatable/graphs/contributors
  * @website https://github.com/avalynx/
@@ -40,7 +40,7 @@ class AvalynxDataTable {
     constructor(id, options = {}, language = {}) {
         this.dt = document.getElementById(id);
         if (this.dt === null) {
-            console.error("AvalynxDataTable: Element with id '" + id + "' not found");
+            console.error(`AvalynxDataTable: Element with id '${id}' not found`);
             return;
         }
         this.id = id;
@@ -59,7 +59,7 @@ class AvalynxDataTable {
             paginationRange: 2,
             loader: null,
             ...options
-        }
+        };
         this.language = {
             showLabel: "Show",
             entriesLabel: "entries",
@@ -69,11 +69,13 @@ class AvalynxDataTable {
             showingEntries: (start, end, total) => `Showing ${start} to ${end} of ${total} entries`,
             showingFilteredEntries: (start, end, filtered, total) => `Showing ${start} to ${end} of ${filtered} entries (filtered from ${total} total entries)`,
             ...language
-        }
-        if (!this.options.listPerPage.includes(options.perPage)) {
+        };
+        if (!this.options.listPerPage.includes(this.options.perPage)) {
             this.options.perPage = 10;
         }
         this.options.searchIsNew = false;
+        this.result = null;
+        this.totalPages = 0;
         this.init();
         this.fetchData();
     }

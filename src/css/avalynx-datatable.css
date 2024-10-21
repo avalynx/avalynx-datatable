@@ -13,7 +13,7 @@
 
 .avalynx-datatable-table th.avalynx-datatable-sorting,
 .avalynx-datatable-table td.avalynx-datatable-sorting,
-.avalynx-datatable-table th.avalynx-datatable-sorting-,
+.avalynx-datatable-table th.avalynx-datatable-sorting-asc,
 .avalynx-datatable-table td.avalynx-datatable-sorting-asc,
 .avalynx-datatable-table th.avalynx-datatable-sorting-desc,
 .avalynx-datatable-table td.avalynx-datatable-sorting-desc,
@@ -62,4 +62,11 @@
 .avalynx-datatable-table td.avalynx-datatable-sorting-asc:before,
 .avalynx-datatable-table td.avalynx-datatable-sorting-desc:after {
     opacity: .7;
+}
+
+.avalynx-datatable-table th.avalynx-datatable-options,
+.avalynx-datatable-table td.avalynx-datatable-options {
+    text-align: center;
+    width: 1%;
+    white-space: nowrap;
 }
