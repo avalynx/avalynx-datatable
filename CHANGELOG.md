@@ -1,5 +1,8 @@
 # AvalynxDataTable Changelog
 
+## 0.0.4
+- [x] assetscomposer.json added
+
 ## 0.0.3
 - [x] added: css for options in th/td
 - [x] added: classes in result for th/td

@@ -3,7 +3,7 @@
  *
  * A simple, lightweight, and customizable data table for the web. Based on Bootstrap >=5.3 without any framework dependencies.
  *
- * @version 0.0.3
+ * @version 0.0.4
  * @license MIT
  * @author https://github.com/avalynx/avalynx-datatable/graphs/contributors
  * @website https://github.com/avalynx/
@@ -300,7 +300,7 @@ export class AvalynxDataTable {
                 if (column.class) {
                     td.classList.add(column.class);
                 }
-                if (rowData.data_class && rowData.data_class[column.id]) {
+                if (rowData.data_export class && rowData.data_class[column.id]) {
                     td.classList.add(rowData.data_class[column.id]);
                 }
                 if (column.raw) {
