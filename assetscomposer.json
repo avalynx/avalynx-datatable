@@ -7,7 +7,6 @@
   ],
   "files-dev": [
     "src/css/avalynx-datatable.css",
-    "src/js/avalynx-datatable.esm.js",
     "src/js/avalynx-datatable.js"
   ]
 }
