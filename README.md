@@ -84,6 +84,17 @@ import 'avalynx-datatable/dist/css/avalynx-datatable.min.css';
 
 Make sure to also include Bootstrap's JS/CSS in your project to ensure AvalynxDataTable displays correctly.
 
+## Installation via Symfony AssetComposer
+
+More information about the Symfony AssetComposer Bundle can be found [here](https://github.com/jbsnewmedia/asset-composer-bundle).
+
+```twig
+{% do addAssetComposer('avalynx/avalynx-datatable/dist/css/avalynx-datatable.css') %}
+{% do addAssetComposer('avalynx/avalynx-datatable/dist/js/avalynx-datatable.js') %}
+```
+
+Make sure to also include Bootstrap's JS/CSS in your project to ensure AvalynxDataTable displays correctly.
+
 ## Installation via Composer ([Link](https://packagist.org/packages/avalynx/avalynx-datatable))
 
 AvalynxDataTable is also available as a Composer package. You can add it to your project with the following command:
