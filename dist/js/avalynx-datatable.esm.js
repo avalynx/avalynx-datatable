@@ -3,7 +3,7 @@
  *
  * A simple, lightweight, and customizable data table for the web. Based on Bootstrap >=5.3 without any framework dependencies.
  *
- * @version 1.0.0
+ * @version 1.0.1
  * @license MIT
  * @author https://github.com/avalynx/avalynx-datatable/graphs/contributors
  * @website https://github.com/avalynx/
@@ -35,6 +35,8 @@
  * @param {function} language.showingFilteredEntries - A function to format the text showing the range of visible entries out of the total when filtered (default: (start, end, filtered, total) => 'Showing ${start} to ${end} of ${filtered} entries (filtered from ${total} entries)').
  *
  */
+
+import * as bootstrap from 'bootstrap';
 
 export class AvalynxDataTable {
     constructor(id, options = {}, language = {}) {
@@ -300,7 +302,7 @@ export class AvalynxDataTable {
                 if (column.class) {
                     td.classList.add(column.class);
                 }
-                if (rowData.data_export class && rowData.data_class[column.id]) {
+                if (rowData.data_class && rowData.data_class[column.id]) {
                     td.classList.add(rowData.data_class[column.id]);
                 }
                 if (column.raw) {

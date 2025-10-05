@@ -3,7 +3,7 @@
  *
  * A simple, lightweight, and customizable data table for the web. Based on Bootstrap >=5.3 without any framework dependencies.
  *
- * @version 1.0.0
+ * @version 1.0.1
  * @license MIT
  * @author https://github.com/avalynx/avalynx-datatable/graphs/contributors
  * @website https://github.com/avalynx/
@@ -443,4 +443,8 @@ class AvalynxDataTable {
             this.dt.appendChild(overlay);
         }
     }
+}
+
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = AvalynxDataTable;
 }

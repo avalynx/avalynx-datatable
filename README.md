@@ -46,8 +46,8 @@ Replace `path/to/avalynx-datatable.js` and `path/to/avalynx-datatable.css` with 
 AvalynxDataTable is also available via [jsDelivr](https://www.jsdelivr.com/). You can include it in your project like this:
 
 ```html
-<link href="https://cdn.jsdelivr.net/npm/avalynx-datatable@1.0.0/dist/css/avalynx-datatable.min.css" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/avalynx-datatable@1.0.0/dist/js/avalynx-datatable.min.js"></script>
+<link href="https://cdn.jsdelivr.net/npm/avalynx-datatable@1.0.1/dist/css/avalynx-datatable.min.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/avalynx-datatable@1.0.1/dist/js/avalynx-datatable.min.js"></script>
 ```
 
 Make sure to also include Bootstrap's JS/CSS in your project to ensure AvalynxDataTable displays correctly.
