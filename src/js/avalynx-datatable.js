@@ -44,6 +44,9 @@ class AvalynxDataTable {
             return;
         }
         this.id = id;
+        if (options === null || typeof options !== 'object') {
+            options = {};
+        }
         this.options = {
             apiUrl: '',
             apiMethod: 'POST',
@@ -60,6 +63,9 @@ class AvalynxDataTable {
             loader: null,
             ...options
         };
+        if (language === null || typeof language !== 'object') {
+            language = {};
+        }
         this.language = {
             showLabel: "Show",
             entriesLabel: "entries",
