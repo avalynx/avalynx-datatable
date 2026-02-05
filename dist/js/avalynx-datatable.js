@@ -78,6 +78,8 @@ class AvalynxDataTable {
         this.options.searchIsNew = false;
         this.result = null;
         this.totalPages = 0;
+        this.avalynxTableInstance = null;
+        this.useAvalynxTable = this.options.className.includes('avalynx-table');
         this._boundHandlers = {
             sort: null,
             perPageChange: null,
@@ -95,7 +97,9 @@ class AvalynxDataTable {
         const tableTemplate = document.getElementById("avalynx-datatable-table").content.cloneNode(true);
         const bottomTemplate = document.getElementById("avalynx-datatable-bottom").content.cloneNode(true);
 
-        tableTemplate.querySelector("table").className = `${this.options.className} avalynx-datatable-table`;
+        const table = tableTemplate.querySelector("table");
+        table.className = `${this.options.className} avalynx-datatable-table`;
+        table.id = `${this.id}-table`;
 
         const topEntries = topTemplate.querySelector(".avalynx-datatable-top-entries");
         topEntries.querySelector("label:first-child").textContent = this.language.showLabel;
@@ -315,6 +319,17 @@ class AvalynxDataTable {
         this.updateSortingIcons();
         this.populateShowEntries();
         this.populatePagination();
+        this.initAvalynxTable();
+    }
+
+    initAvalynxTable() {
+        if (!this.useAvalynxTable) return;
+        if (typeof AvalynxTable === 'undefined') {
+            console.warn('AvalynxDataTable: AvalynxTable not found. Responsive table features disabled.');
+            return;
+        }
+
+        this.avalynxTableInstance = new AvalynxTable(`#${this.id}-table`);
     }
 
     setupSortingEvent() {
@@ -465,6 +480,7 @@ class AvalynxDataTable {
 
         this._boundHandlers = null;
         this.result = null;
+        this.avalynxTableInstance = null;
     }
 }
 
