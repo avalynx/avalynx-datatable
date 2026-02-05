@@ -3,7 +3,7 @@
  *
  * A simple, lightweight, and customizable data table for the web. Based on Bootstrap >=5.3 without any framework dependencies.
  *
- * @version 1.0.1
+ * @version 1.0.2
  * @license MIT
  * @author https://github.com/avalynx/avalynx-datatable/graphs/contributors
  * @website https://github.com/avalynx/
@@ -41,11 +41,12 @@ import * as bootstrap from 'bootstrap';
 export class AvalynxDataTable {
     constructor(id, options = {}, language = {}) {
         this.dt = document.getElementById(id);
-        if (this.dt === null) {
+        if (!this.dt) {
             console.error(`AvalynxDataTable: Element with id '${id}' not found`);
             return;
         }
         this.id = id;
+
         this.options = {
             apiUrl: '',
             apiMethod: 'POST',
@@ -60,8 +61,9 @@ export class AvalynxDataTable {
             paginationPrevNext: true,
             paginationRange: 2,
             loader: null,
-            ...options
+            ...(options && typeof options === 'object' ? options : {})
         };
+
         this.language = {
             showLabel: "Show",
             entriesLabel: "entries",
@@ -70,14 +72,20 @@ export class AvalynxDataTable {
             nextLabel: "Next",
             showingEntries: (start, end, total) => `Showing ${start} to ${end} of ${total} entries`,
             showingFilteredEntries: (start, end, filtered, total) => `Showing ${start} to ${end} of ${filtered} entries (filtered from ${total} total entries)`,
-            ...language
+            ...(language && typeof language === 'object' ? language : {})
         };
         if (!this.options.listPerPage.includes(this.options.perPage)) {
-            this.options.perPage = 10;
+            this.options.perPage = this.options.listPerPage[0] || 10;
         }
         this.options.searchIsNew = false;
         this.result = null;
         this.totalPages = 0;
+        this._boundHandlers = {
+            sort: null,
+            perPageChange: null,
+            searchInput: null,
+            searchDebounceTimeout: null
+        };
         this.init();
         this.fetchData();
     }
@@ -85,47 +93,43 @@ export class AvalynxDataTable {
     init() {
         this.ensureTemplatesExist();
 
-        const template_avalynx_datatable_top = document.getElementById("avalynx-datatable-top").content.cloneNode(true);
-        const template_avalynx_datatable_table = document.getElementById("avalynx-datatable-table").content.cloneNode(true);
-        const template_avalynx_datatable_bottom = document.getElementById("avalynx-datatable-bottom").content.cloneNode(true);
+        const topTemplate = document.getElementById("avalynx-datatable-top").content.cloneNode(true);
+        const tableTemplate = document.getElementById("avalynx-datatable-table").content.cloneNode(true);
+        const bottomTemplate = document.getElementById("avalynx-datatable-bottom").content.cloneNode(true);
 
-        template_avalynx_datatable_table.querySelector("table").className = this.options.className + ' avalynx-datatable-table';
+        tableTemplate.querySelector("table").className = `${this.options.className} avalynx-datatable-table`;
 
-        template_avalynx_datatable_top.querySelector(".avalynx-datatable-top-entries label:first-child").textContent = this.language.showLabel;
-        template_avalynx_datatable_top.querySelector(".avalynx-datatable-top-entries label:last-child").textContent = this.language.entriesLabel;
-        template_avalynx_datatable_top.querySelector(".avalynx-datatable-top-search label").textContent = this.language.searchLabel;
+        const topEntries = topTemplate.querySelector(".avalynx-datatable-top-entries");
+        topEntries.querySelector("label:first-child").textContent = this.language.showLabel;
+        topEntries.querySelector("label:last-child").textContent = this.language.entriesLabel;
+        topTemplate.querySelector(".avalynx-datatable-top-search label").textContent = this.language.searchLabel;
 
-        this.dt.append(template_avalynx_datatable_top, template_avalynx_datatable_table, template_avalynx_datatable_bottom);
+        this.dt.append(topTemplate, tableTemplate, bottomTemplate);
 
         this.setupOverlayAndLoader();
         this.setupPerPageChangeEvent();
         this.setupSearchInputChangeEvent();
+        this.setupSortingEvent();
 
         this.populatePerPageOptions();
         this.populateSearchInput();
     }
 
     async fetchData() {
-        if (this.options.loader === null) {
-            const overlay = document.getElementById(`${this.id}-overlay`);
-            overlay.style.display = 'flex';
-        } else {
-            this.options.loader.load=true;
-        }
+        this.showLoader(true);
 
         try {
             const postData = {
-                "search": this.options.search,
-                "sorting": this.options.sorting,
-                "page": this.options.currentPage,
-                "perpage": this.options.perPage,
-                "searchisnew": (this.options.searchIsNew === true) ? 1 : 0,
+                search: this.options.search,
+                sorting: JSON.stringify(this.options.sorting),
+                page: this.options.currentPage,
+                perpage: this.options.perPage,
+                searchisnew: this.options.searchIsNew ? 1 : 0,
                 ...this.options.apiParams
             };
-            postData.sorting = JSON.stringify(postData.sorting);
 
             let url = this.options.apiUrl;
-            let fetchOptions = {
+            const fetchOptions = {
                 method: this.options.apiMethod,
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded',
@@ -133,282 +137,273 @@ export class AvalynxDataTable {
             };
 
             if (this.options.apiMethod === 'GET') {
-                const queryParams = new URLSearchParams(postData).toString();
-                url += '?' + queryParams;
+                url += '?' + new URLSearchParams(postData).toString();
             } else {
-                const formBody = Object.keys(postData).map(key => {
-                    return encodeURIComponent(key) + '=' + encodeURIComponent(postData[key]);
-                }).join('&');
-                fetchOptions.body = formBody;
+                fetchOptions.body = new URLSearchParams(postData).toString();
             }
 
             const response = await fetch(url, fetchOptions);
             const data = await response.json();
+
             if (data.error) {
+                console.error('AvalynxDataTable Error:', data.error);
                 alert(data.error);
-                console.error('Error:', data.error);
                 return;
             }
+
             this.result = data;
             this.options.searchIsNew = false;
             this.options.currentPage = this.result.count.page;
+
             if (this.options.perPage !== this.result.count.perpage) {
                 this.options.perPage = this.result.count.perpage;
                 this.populatePerPageOptions();
             }
+
             this.totalPages = Math.ceil(this.result.count.filtered / this.result.count.perpage);
             this.populateTable();
+
             if (this.options.sorting !== this.result.sorting) {
                 this.options.sorting = this.result.sorting;
                 this.updateSortingIcons();
             }
         } catch (error) {
-            alert(error);
-            console.error('Error:', error);
+            console.error('AvalynxDataTable Error:', error);
+            alert(error.message || error);
         } finally {
-            if (this.options.loader === null) {
-                const overlay = document.getElementById(`${this.id}-overlay`);
-                if (overlay) {
-                    overlay.style.display = 'none';
-                }
-            } else {
-                this.options.loader.load = false;
+            this.showLoader(false);
+        }
+    }
+
+    showLoader(show) {
+        if (this.options.loader) {
+            this.options.loader.load = show;
+        } else {
+            const overlay = document.getElementById(`${this.id}-overlay`);
+            if (overlay) {
+                overlay.style.display = show ? 'flex' : 'none';
             }
         }
     }
 
     ensureTemplatesExist() {
-        this.addTemplateIfMissing("avalynx-datatable-top", `
-<div class="d-flex flex-column flex-md-row avalynx-datatable-top">
-	<div class="d-flex align-self-center pb-2 avalynx-datatable-top-entries">
-		<label class="align-self-center">Show</label>
-		<div class="align-self-center px-2">
-			<select class="form-select"> </select>
-		</div>
-		<label class="align-self-center">entries</label>
-	</div>
-	<div class="flex-grow-1"></div>
-	<div class="d-flex align-self-center pb-2 avalynx-datatable-top-search">
-		<label class="align-self-center">Search</label>
-		<div class="align-self-center ps-2"><input type="text" class="form-control"></div>
-	</div>
-</div>
-        `);
+        const templates = {
+            "avalynx-datatable-top": `
+                <div class="d-flex flex-column flex-md-row avalynx-datatable-top">
+                    <div class="d-flex align-self-center pb-2 avalynx-datatable-top-entries">
+                        <label class="align-self-center"></label>
+                        <div class="align-self-center px-2">
+                            <select class="form-select"></select>
+                        </div>
+                        <label class="align-self-center"></label>
+                    </div>
+                    <div class="flex-grow-1"></div>
+                    <div class="d-flex align-self-center pb-2 avalynx-datatable-top-search">
+                        <label class="align-self-center"></label>
+                        <div class="align-self-center ps-2"><input type="text" class="form-control"></div>
+                    </div>
+                </div>`,
+            "avalynx-datatable-table": `
+                <table>
+                    <thead></thead>
+                    <tbody></tbody>
+                </table>`,
+            "avalynx-datatable-bottom": `
+                <div class="d-flex flex-column flex-md-row avalynx-datatable-bottom">
+                    <div class="d-flex avalynx-datatable-bottom-entries pb-2"></div>
+                    <div class="flex-grow-1"></div>
+                    <nav class="align-self-center avalynx-datatable-bottom-pagination">
+                        <ul class="pagination"></ul>
+                    </nav>
+                </div>`
+        };
 
-        this.addTemplateIfMissing("avalynx-datatable-table", `
-<table>
-	<thead></thead>
-	<tbody></tbody>
-</table>
-        `);
-
-        this.addTemplateIfMissing("avalynx-datatable-bottom", `
-<div class="d-flex flex-column flex-md-row avalynx-datatable-bottom">
-	<div class="d-flex avalynx-datatable-bottom-entries pb-2"></div>
-	<div class="flex-grow-1"></div>
-	<nav class="align-self-center avalynx-datatable-bottom-pagination">
-		<ul class="pagination"></ul>
-	</nav>
-</div>
-        `);
-    }
-
-    addTemplateIfMissing(id, content) {
-        if (!document.getElementById(id)) {
-            const template = document.createElement('template');
-            template.id = id;
-            template.innerHTML = content;
-            document.body.appendChild(template);
+        for (const [id, content] of Object.entries(templates)) {
+            if (!document.getElementById(id)) {
+                const template = document.createElement('template');
+                template.id = id;
+                template.innerHTML = content;
+                document.body.appendChild(template);
+            }
         }
     }
 
     setupPerPageChangeEvent() {
-        const select = this.dt.querySelector(".avalynx-datatable-top .avalynx-datatable-top-entries .form-select");
-        select.addEventListener('change', (event) => {
-            this.options.perPage = parseInt(event.target.value);
-            this.fetchData(this.options.currentPage);
-        });
+        const select = this.dt.querySelector(".avalynx-datatable-top-entries .form-select");
+        this._boundHandlers.perPageChange = (event) => {
+            this.options.perPage = parseInt(event.target.value, 10);
+            this.fetchData();
+        };
+        select.addEventListener('change', this._boundHandlers.perPageChange);
     }
 
     populatePerPageOptions() {
-        const select = this.dt.querySelector(".avalynx-datatable-top .avalynx-datatable-top-entries .form-select");
-        select.innerHTML = '';
-        this.options.listPerPage.forEach((num) => {
-            const option = document.createElement("option");
-            option.value = num;
-            option.textContent = num;
-            if (num === this.options.perPage) {
-                option.selected = true;
-            }
-            select.appendChild(option);
-        });
+        const select = this.dt.querySelector(".avalynx-datatable-top-entries .form-select");
+        select.innerHTML = this.options.listPerPage
+            .map(num => `<option value="${num}"${num === this.options.perPage ? ' selected' : ''}>${num}</option>`)
+            .join('');
     }
 
     setupSearchInputChangeEvent() {
-        const searchInput = this.dt.querySelector(".avalynx-datatable-top .avalynx-datatable-top-search .form-control");
-        let debounceTimeout;
+        const searchInput = this.dt.querySelector(".avalynx-datatable-top-search .form-control");
 
-        searchInput.addEventListener('input', (event) => {
-            clearTimeout(debounceTimeout);
-            debounceTimeout = setTimeout(() => {
-                if (event.target.value !== this.options.search) {
+        this._boundHandlers.searchInput = (event) => {
+            clearTimeout(this._boundHandlers.searchDebounceTimeout);
+            this._boundHandlers.searchDebounceTimeout = setTimeout(() => {
+                const newValue = event.target.value;
+                if (newValue !== this.options.search) {
                     this.options.searchIsNew = true;
+                    this.options.search = newValue;
+                    this.fetchData();
                 }
-                this.options.search = event.target.value;
-                this.fetchData(this.options.currentPage);
             }, this.options.searchWait);
-        });
+        };
+
+        searchInput.addEventListener('input', this._boundHandlers.searchInput);
     }
 
     populateSearchInput() {
-        const searchInput = this.dt.querySelector(".avalynx-datatable-top .avalynx-datatable-top-search .form-control");
+        const searchInput = this.dt.querySelector(".avalynx-datatable-top-search .form-control");
         searchInput.value = this.options.search;
     }
 
     populateTable() {
         const thead = this.dt.querySelector(".avalynx-datatable-table thead");
-        thead.innerHTML = '';
+        const tbody = this.dt.querySelector(".avalynx-datatable-table tbody");
+
         const headerRow = document.createElement("tr");
-        this.result.head.columns.forEach((column) => {
+        for (const column of this.result.head.columns) {
             const th = document.createElement("th");
-            if (column.hidden) {
-                th.classList.add("d-none");
-            }
-            if (column.class) {
-                th.classList.add(column.class);
-            }
             th.textContent = column.name;
-            th.setAttribute("data-avalynx-datatable-column-id", column.id);
+            th.dataset.avalynxDatatableColumnId = column.id;
+
+            if (column.hidden) th.classList.add("d-none");
+            if (column.class) th.classList.add(column.class);
             if (column.sortable) {
                 th.classList.add("avalynx-datatable-sorting");
-                th.setAttribute("data-avalynx-datatable-sortable", "true");
+                th.dataset.avalynxDatatableSortable = "true";
             }
+
             headerRow.appendChild(th);
-        });
+        }
+        thead.innerHTML = '';
         thead.appendChild(headerRow);
 
-        const tbody = this.dt.querySelector(".avalynx-datatable-table tbody");
-        tbody.innerHTML = '';
-        this.result.data.forEach((rowData) => {
+        const fragment = document.createDocumentFragment();
+        for (const rowData of this.result.data) {
             const tr = document.createElement("tr");
-            if (rowData.class) {
-                tr.classList.add(rowData.class);
-            }
-            this.result.head.columns.forEach((column) => {
+            if (rowData.class) tr.classList.add(rowData.class);
+
+            for (const column of this.result.head.columns) {
                 const td = document.createElement("td");
-                if (column.hidden) {
-                    td.classList.add("d-none");
-                }
-                if (column.class) {
-                    td.classList.add(column.class);
-                }
-                if (rowData.data_class && rowData.data_class[column.id]) {
-                    td.classList.add(rowData.data_class[column.id]);
-                }
+
+                if (column.hidden) td.classList.add("d-none");
+                if (column.class) td.classList.add(column.class);
+                if (rowData.data_class?.[column.id]) td.classList.add(rowData.data_class[column.id]);
+
                 if (column.raw) {
-                    tr.appendChild(td);
                     td.innerHTML = rowData.data[column.id];
                 } else {
                     td.textContent = rowData.data[column.id];
-                    tr.appendChild(td);
                 }
-            });
-            tbody.appendChild(tr);
-        });
-        this.setupSortingEvent();
+
+                tr.appendChild(td);
+            }
+            fragment.appendChild(tr);
+        }
+        tbody.innerHTML = '';
+        tbody.appendChild(fragment);
+
+        this.updateSortingIcons();
         this.populateShowEntries();
         this.populatePagination();
     }
 
     setupSortingEvent() {
-        const sortableHeaders = this.dt.querySelectorAll(".avalynx-datatable-table thead th[data-avalynx-datatable-sortable]");
-        sortableHeaders.forEach(header => {
-            header.addEventListener('click', (event) => {
-                const columnId = header.getAttribute('data-avalynx-datatable-column-id');
-                if (!columnId) return;
-                const isCtrlPressed = event.ctrlKey;
-                const isShiftPressed = event.shiftKey;
-                if (this.options.sorting[columnId]) {
-                    let sort = this.options.sorting[columnId] === 'asc' ? 'desc' : 'asc';
-                    if (!isCtrlPressed && !isShiftPressed) {
-                        this.options.sorting = {};
-                    } else {
-                        delete this.options.sorting[columnId];
-                    }
-                    this.options.sorting[columnId] = sort;
-                } else {
-                    if (!isCtrlPressed && !isShiftPressed) {
-                        this.options.sorting = {};
-                    }
-                    this.options.sorting[columnId] = 'asc';
-                }
-                this.fetchData();
-            });
-        });
+        const thead = this.dt.querySelector(".avalynx-datatable-table thead");
+
+        this._boundHandlers.sort = (event) => {
+            const header = event.target.closest('th[data-avalynx-datatable-sortable]');
+            if (!header) return;
+
+            const columnId = header.dataset.avalynxDatatableColumnId;
+            if (!columnId) return;
+
+            const isMultiSort = event.ctrlKey || event.shiftKey;
+            const currentDir = this.options.sorting[columnId];
+            const newDir = currentDir === 'asc' ? 'desc' : 'asc';
+
+            if (!isMultiSort) {
+                this.options.sorting = {};
+            }
+
+            this.options.sorting[columnId] = newDir;
+            this.fetchData();
+        };
+
+        thead.addEventListener('click', this._boundHandlers.sort);
     }
 
     updateSortingIcons() {
         const sortableHeaders = this.dt.querySelectorAll(".avalynx-datatable-table thead th[data-avalynx-datatable-sortable]");
-        sortableHeaders.forEach(header => {
-            const columnId = header.getAttribute('data-avalynx-datatable-column-id');
-            if (!columnId) return;
-            if (this.options.sorting[columnId]) {
-                if (this.options.sorting[columnId] === 'asc') {
-                    header.classList.add('avalynx-datatable-sorting-asc');
-                    header.classList.remove('avalynx-datatable-sorting-desc');
-                } else {
-                    header.classList.add('avalynx-datatable-sorting-desc');
-                    header.classList.remove('avalynx-datatable-sorting-asc');
-                }
-            } else {
-                header.classList.remove('avalynx-datatable-sorting-asc', 'avalynx-datatable-sorting-desc');
+
+        for (const header of sortableHeaders) {
+            const columnId = header.dataset.avalynxDatatableColumnId;
+            const sortDir = this.options.sorting[columnId];
+
+            header.classList.remove('avalynx-datatable-sorting-asc', 'avalynx-datatable-sorting-desc');
+
+            if (sortDir === 'asc') {
+                header.classList.add('avalynx-datatable-sorting-asc');
+            } else if (sortDir === 'desc') {
+                header.classList.add('avalynx-datatable-sorting-desc');
             }
-        });
+        }
     }
 
     populateShowEntries() {
-        const entries = this.dt.querySelector(".avalynx-datatable-bottom .avalynx-datatable-bottom-entries");
-        const start = this.result.count.start;
-        const end = this.result.count.end;
-        const total = this.result.count.total;
-        const filtered = this.result.count.filtered;
+        const entries = this.dt.querySelector(".avalynx-datatable-bottom-entries");
+        const { start, end, filtered, all } = this.result.count;
 
-        if (this.result.count.filtered === this.result.count.all) {
-            entries.textContent = this.language.showingEntries(start, end, total);
-        } else {
-            entries.textContent = this.language.showingFilteredEntries(start, end, filtered, total);
-        }
+        entries.textContent = filtered === all
+            ? this.language.showingEntries(start, end, all)
+            : this.language.showingFilteredEntries(start, end, filtered, all);
     }
 
     populatePagination() {
         const paginationUl = this.dt.querySelector(".avalynx-datatable-bottom-pagination ul");
-        paginationUl.innerHTML = '';
+        const fragment = document.createDocumentFragment();
 
-        const prevDisabled = this.options.currentPage === 1;
-        if (this.options.paginationPrevNext) {
-            this.addPaginationItem(paginationUl, this.options.currentPage - 1, this.language.previousLabel, prevDisabled);
+        const { currentPage, paginationPrevNext, paginationRange } = this.options;
+
+        if (paginationPrevNext) {
+            this.createPaginationItem(fragment, currentPage - 1, this.language.previousLabel, currentPage === 1);
         }
 
-        let startPage = Math.max(1, this.options.currentPage - this.options.paginationRange);
-        let endPage = Math.min(this.options.currentPage + this.options.paginationRange, this.totalPages);
+        const startPage = Math.max(1, currentPage - paginationRange);
+        const endPage = Math.min(currentPage + paginationRange, this.totalPages);
 
         for (let i = startPage; i <= endPage; i++) {
-            this.addPaginationItem(paginationUl, i, i, false);
+            this.createPaginationItem(fragment, i, i, false);
         }
 
-        const nextDisabled = this.options.currentPage === this.totalPages;
-        if (this.options.paginationPrevNext) {
-            this.addPaginationItem(paginationUl, this.options.currentPage + 1, this.language.nextLabel, nextDisabled);
+        if (paginationPrevNext) {
+            this.createPaginationItem(fragment, currentPage + 1, this.language.nextLabel, currentPage === this.totalPages);
         }
+
+        paginationUl.innerHTML = '';
+        paginationUl.appendChild(fragment);
     }
 
-    addPaginationItem(paginationUl, pageNumber, text = pageNumber, disabled = false) {
+    createPaginationItem(container, pageNumber, text, disabled) {
         const li = document.createElement("li");
-        li.className = "page-item" + (pageNumber === this.options.currentPage ? " active" : "") + (disabled ? " disabled" : "");
+        li.className = `page-item${pageNumber === this.options.currentPage ? ' active' : ''}${disabled ? ' disabled' : ''}`;
+
         const a = document.createElement("a");
         a.className = "page-link";
         a.href = "#";
         a.textContent = text;
+
         if (!disabled) {
             a.addEventListener('click', (e) => {
                 e.preventDefault();
@@ -416,33 +411,61 @@ export class AvalynxDataTable {
                 this.fetchData();
             });
         }
+
         li.appendChild(a);
-        paginationUl.appendChild(li);
+        container.appendChild(li);
     }
 
     setupOverlayAndLoader() {
-        if (this.options.loader === null) {
-            const overlay = document.createElement('div');
-            overlay.id = `${this.id}-overlay`;
-            overlay.style.position = 'absolute';
-            overlay.style.top = 0;
-            overlay.style.left = 0;
-            overlay.style.width = '100%';
-            overlay.style.height = '100%';
-            overlay.style.display = 'none';
-            overlay.style.alignItems = 'center';
-            overlay.style.justifyContent = 'center';
-            overlay.style.backgroundColor = 'rgba(var(--bs-body-bg-rgb, 0, 0, 0), 0.7)';
-            overlay.style.zIndex = '1000';
+        if (this.options.loader) return;
 
-            const spinner = document.createElement('div');
-            spinner.className = 'spinner-border text-primary';
-            spinner.role = 'status';
-            spinner.innerHTML = '<span class="visually-hidden">Loading...</span>';
+        const overlay = document.createElement('div');
+        overlay.id = `${this.id}-overlay`;
+        Object.assign(overlay.style, {
+            position: 'absolute',
+            top: '0',
+            left: '0',
+            width: '100%',
+            height: '100%',
+            display: 'none',
+            alignItems: 'center',
+            justifyContent: 'center',
+            backgroundColor: 'rgba(var(--bs-body-bg-rgb, 0, 0, 0), 0.7)',
+            zIndex: '1000'
+        });
 
-            overlay.appendChild(spinner);
-            this.dt.style.position = 'relative';
-            this.dt.appendChild(overlay);
+        overlay.innerHTML = '<div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div>';
+
+        this.dt.style.position = 'relative';
+        this.dt.appendChild(overlay);
+    }
+
+    refresh() {
+        this.fetchData();
+    }
+
+    destroy() {
+        clearTimeout(this._boundHandlers.searchDebounceTimeout);
+
+        const thead = this.dt.querySelector(".avalynx-datatable-table thead");
+        if (thead && this._boundHandlers.sort) {
+            thead.removeEventListener('click', this._boundHandlers.sort);
         }
+
+        const select = this.dt.querySelector(".avalynx-datatable-top-entries .form-select");
+        if (select && this._boundHandlers.perPageChange) {
+            select.removeEventListener('change', this._boundHandlers.perPageChange);
+        }
+
+        const searchInput = this.dt.querySelector(".avalynx-datatable-top-search .form-control");
+        if (searchInput && this._boundHandlers.searchInput) {
+            searchInput.removeEventListener('input', this._boundHandlers.searchInput);
+        }
+
+        this.dt.innerHTML = '';
+        this.dt.style.position = '';
+
+        this._boundHandlers = null;
+        this.result = null;
     }
 }

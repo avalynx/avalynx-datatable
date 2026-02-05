@@ -3,7 +3,7 @@
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>DataTable multiple instances | AvalynxDataTable Example</title>
+	<title>DataTable with slow response | AvalynxDataTable Example</title>
 
 	<!-- Bootstrap 5.3 -->
 	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -15,6 +15,13 @@
 	<script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9/build/languages/javascript.min.js"></script>
 	<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9/build/styles/stackoverflow-light.min.css" id="hljsTheme">
 	<script>hljs.highlightAll();</script>
+
+    <!-- AvalynxLoader 1.0.1 -->
+    <script src="https://cdn.jsdelivr.net/npm/avalynx-loader@1.0.1/dist/js/avalynx-loader.min.js"></script>
+
+    <!-- AvalynxTable 1.0.1 -->
+    <link href="https://cdn.jsdelivr.net/npm/avalynx-table@1.0.1/dist/css/avalynx-table.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/avalynx-table@1.0.1/dist/js/avalynx-table.min.js"></script>
 
     <!-- AvalynxDataTable -->
     <link href="../dist/css/avalynx-datatable.css" rel="stylesheet">
@@ -37,48 +44,25 @@
 	<div class="container" id="avalynx-datatable"></div>
 	<br/>
 	<br/>
-    <div class="container" id="avalynx-datatable2"></div>
-    <br/>
-    <br/>
 	<div class="alert alert-info">
-		This is an example of multiple instances of the AvalynxDataTable. It is a simple table with some random data. The table is sortable, searchable and paginated. The data is fetched from a PHP script.
+		This is an example of the AvalynxDataTable. It is a simple table with some random data. The table is sortable, searchable and paginated. The data is fetched from a PHP script.
 	</div>
 
 	<script>
 
 		new AvalynxDataTable("avalynx-datatable", {
 			apiUrl: "php/result.php",
-            apiParams: {
-                "key": "1-2-3-4-5-6-7-8-9-10"
-            },
 			perPage: 10,
 			search: "",
 			sorting: {
 				"name": "asc",
 				"age": "desc"
-			}
-		}, {
-			showLabel: "Zeige",
-			entriesLabel: "Einträge",
-			searchLabel: "Suche",
-			previousLabel: "Zurück",
-			nextLabel: "Weiter",
-			showingEntries: (start, end, total) => `Zeige ${start} bis ${end} von ${total} Einträgen`,
-			showingFilteredEntries: (start, end, filtered, total) => `Zeige ${start} bis ${end} von ${filtered} Einträgen (gefiltert von ${total} Einträgen)`
-		});
-
-        new AvalynxDataTable("avalynx-datatable2", {
-            apiUrl: "php/result2.get.php",
-            apiMethod: "GET",
-            apiParams: {
-                "key": "1-2-3-4-5-6-7-8-9-10"
-            },
-            listPerPage: [5, 10, 15, 20],
-            perPage: 5,
-            sorting: {
-                "price": "asc"
-            }
-        });
+			},
+            className: "avalynx-table avalynx-table-md table table-bordered table-striped",
+            loader: new AvalynxLoader('#avalynx-datatable', {
+                className: 'spinner-border text-danger',
+            })
+		}, {});
 
 	</script>
 
@@ -86,38 +70,14 @@
 	<h3>Source of example<a class="p-1 float-end btn btn-secondary btn-small" id="copyButton">Copy to clipboard</a></h3>
 	<pre><code class="language-javascript" id="codeBlock">
 new AvalynxDataTable("avalynx-datatable", {
-    apiUrl: "php/result.php",
-    apiParams: {
-        "key": "1-2-3-4-5-6-7-8-9-10"
-    },
-    perPage: 10,
-    search: "",
-    sorting: {
-        "name": "asc",
-        "age": "desc"
-    }
-}, {
-    showLabel: "Zeige",
-    entriesLabel: "Einträge",
-    searchLabel: "Suche",
-    previousLabel: "Zurück",
-    nextLabel: "Weiter",
-    showingEntries: (start, end, total) => `Zeige ${start} bis ${end} von ${total} Einträgen`,
-    showingFilteredEntries: (start, end, filtered, total) => `Zeige ${start} bis ${end} von ${filtered} Einträgen (gefiltert von ${total} Einträgen)`
-});
-
-new AvalynxDataTable("avalynx-datatable2", {
-    apiUrl: "php/result2.get.php",
-    apiMethod: "GET",
-    apiParams: {
-        "key": "1-2-3-4-5-6-7-8-9-10"
-    },
-    listPerPage: [5, 10, 15, 20],
-    perPage: 5,
-    sorting: {
-        "price": "asc"
-    }
-});
+	apiUrl: "result-slow.php",
+	perPage: 10,
+	search: "",
+	sorting: {
+		"name": "asc",
+		"age": "desc"
+	}
+}, {});
 	</code></pre>
 
 	<a href="https://github.com/avalynx/avalynx-datatable" target="_blank" class="btn btn-primary">AvalynxDataTable on GitHub</a> <a href="https://github.com/avalynx/" target="_blank" class="btn btn-primary">Avalynx on GitHub</a>
