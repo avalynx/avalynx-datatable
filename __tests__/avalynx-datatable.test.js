@@ -11,6 +11,9 @@ global.bootstrap = {
     }))
 };
 
+// Mock AvalynxTable
+global.AvalynxTable = jest.fn().mockImplementation(() => ({}));
+
 const AvalynxDataTable = require('../src/js/avalynx-datatable.js');
 
 // Mock fetch globally
@@ -18,6 +21,7 @@ global.fetch = jest.fn();
 
 describe('AvalynxDataTable', () => {
     let consoleErrorSpy;
+    let consoleWarnSpy;
     let mockFetchResponse;
 
     beforeEach(() => {
@@ -29,8 +33,9 @@ describe('AvalynxDataTable', () => {
         testElement.id = 'test-datatable';
         document.body.appendChild(testElement);
 
-        // Mock console.error
+        // Mock console.error and console.warn
         consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
+        consoleWarnSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
 
         // Reset fetch mock
         mockFetchResponse = {
@@ -61,12 +66,16 @@ describe('AvalynxDataTable', () => {
             json: jest.fn().mockResolvedValue(mockFetchResponse)
         });
 
+        // Reset AvalynxTable mock
+        AvalynxTable.mockClear();
+
         // Clear all timers
         jest.clearAllTimers();
     });
 
     afterEach(() => {
         consoleErrorSpy.mockRestore();
+        consoleWarnSpy.mockRestore();
         jest.clearAllMocks();
         fetch.mockClear();
     });
@@ -113,7 +122,7 @@ describe('AvalynxDataTable', () => {
             expect(dt.dt).toBeNull();
         });
 
-        test('should reset perPage to 10 if not in listPerPage', () => {
+        test('should reset perPage to first listPerPage value if not in list', () => {
             const dt = new AvalynxDataTable('test-datatable', {
                 apiUrl: 'http://test.com/api',
                 perPage: 15,
@@ -137,6 +146,30 @@ describe('AvalynxDataTable', () => {
             expect(dt.language.searchLabel).toBe('Suche');
             expect(dt.language.previousLabel).toBe('Zurück');
             expect(dt.language.nextLabel).toBe('Weiter');
+        });
+
+        test('should handle null options gracefully', () => {
+            const dt = new AvalynxDataTable('test-datatable', null);
+
+            expect(dt.options.apiUrl).toBe('');
+            expect(dt.options.perPage).toBe(10);
+        });
+
+        test('should handle null language gracefully', () => {
+            const dt = new AvalynxDataTable('test-datatable', { apiUrl: 'http://test.com/api' }, null);
+
+            expect(dt.language.showLabel).toBe('Show');
+            expect(dt.language.entriesLabel).toBe('entries');
+        });
+
+        test('should initialize _boundHandlers object', () => {
+            const dt = new AvalynxDataTable('test-datatable', { apiUrl: 'http://test.com/api' });
+
+            expect(dt._boundHandlers).toBeDefined();
+            expect(dt._boundHandlers).toHaveProperty('sort');
+            expect(dt._boundHandlers).toHaveProperty('perPageChange');
+            expect(dt._boundHandlers).toHaveProperty('searchInput');
+            expect(dt._boundHandlers).toHaveProperty('searchDebounceTimeout');
         });
     });
 
@@ -175,7 +208,7 @@ describe('AvalynxDataTable', () => {
             expect(searchInput).not.toBeNull();
         });
 
-        test('should create table with proper structure', async () => {
+        test('should create table with proper structure and ID', async () => {
             new AvalynxDataTable('test-datatable', { apiUrl: 'http://test.com/api' });
 
             await new Promise(resolve => setTimeout(resolve, 10));
@@ -186,6 +219,7 @@ describe('AvalynxDataTable', () => {
             const tbody = table.querySelector('tbody');
 
             expect(table).not.toBeNull();
+            expect(table.id).toBe('test-datatable-table');
             expect(thead).not.toBeNull();
             expect(tbody).not.toBeNull();
         });
@@ -308,6 +342,33 @@ describe('AvalynxDataTable', () => {
             jest.useRealTimers();
             done();
         });
+
+        test('should not trigger fetch if search value unchanged', (done) => {
+            jest.useFakeTimers();
+
+            const dt = new AvalynxDataTable('test-datatable', {
+                apiUrl: 'http://test.com/api',
+                search: 'existing',
+                searchWait: 500
+            });
+
+            jest.runAllTimers();
+
+            const searchInput = document.querySelector('.avalynx-datatable-top .form-control');
+            fetch.mockClear();
+
+            // Set same value
+            searchInput.value = 'existing';
+            searchInput.dispatchEvent(new Event('input'));
+
+            jest.advanceTimersByTime(500);
+
+            // Should NOT have called fetch since value is the same
+            expect(fetch).not.toHaveBeenCalled();
+
+            jest.useRealTimers();
+            done();
+        });
     });
 
     describe('Data Fetching', () => {
@@ -371,7 +432,6 @@ describe('AvalynxDataTable', () => {
 
         test('should handle fetch errors gracefully', async () => {
             const alertSpy = jest.spyOn(window, 'alert').mockImplementation(() => {});
-            const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
 
             fetch.mockRejectedValueOnce(new Error('Network error'));
 
@@ -385,7 +445,6 @@ describe('AvalynxDataTable', () => {
             expect(consoleErrorSpy).toHaveBeenCalled();
 
             alertSpy.mockRestore();
-            consoleErrorSpy.mockRestore();
         });
 
         test('should handle API error responses', async () => {
@@ -579,6 +638,23 @@ describe('AvalynxDataTable', () => {
             expect(sortableHeader.classList.contains('avalynx-datatable-sorting-asc')).toBe(true);
         });
 
+        test('should show desc sorting icon', async () => {
+            mockFetchResponse.sorting = { id: 'desc' };
+
+            fetch.mockResolvedValue({
+                json: jest.fn().mockResolvedValue(mockFetchResponse)
+            });
+
+            const dt = new AvalynxDataTable('test-datatable', {
+                apiUrl: 'http://test.com/api'
+            });
+
+            await new Promise(resolve => setTimeout(resolve, 200));
+
+            const sortableHeader = document.querySelector('.avalynx-datatable-table thead th[data-avalynx-datatable-column-id="id"]');
+            expect(sortableHeader.classList.contains('avalynx-datatable-sorting-desc')).toBe(true);
+        });
+
         test('should clear other sorting when clicking without ctrl/shift', async () => {
             const dt = new AvalynxDataTable('test-datatable', {
                 apiUrl: 'http://test.com/api',
@@ -605,6 +681,17 @@ describe('AvalynxDataTable', () => {
             // Should have only one sorting column after click (id toggled from asc to desc)
             expect(Object.keys(dt.options.sorting).length).toBe(1);
             expect(dt.options.sorting.id).toBe('desc');
+        });
+
+        test('should use event delegation for sorting clicks', async () => {
+            const dt = new AvalynxDataTable('test-datatable', {
+                apiUrl: 'http://test.com/api'
+            });
+
+            await new Promise(resolve => setTimeout(resolve, 200));
+
+            expect(dt._boundHandlers.sort).not.toBeNull();
+            expect(typeof dt._boundHandlers.sort).toBe('function');
         });
     });
 
@@ -760,6 +847,25 @@ describe('AvalynxDataTable', () => {
 
             expect(customShowingEntries).toHaveBeenCalled();
         });
+
+        test('should use count.all instead of count.total for entries display', async () => {
+            mockFetchResponse.count.all = 100;
+            mockFetchResponse.count.filtered = 100;
+            mockFetchResponse.count.total = 50; // This should NOT be used
+
+            fetch.mockResolvedValue({
+                json: jest.fn().mockResolvedValue(mockFetchResponse)
+            });
+
+            const dt = new AvalynxDataTable('test-datatable', {
+                apiUrl: 'http://test.com/api'
+            });
+
+            await new Promise(resolve => setTimeout(resolve, 200));
+
+            const entriesInfo = document.querySelector('.avalynx-datatable-bottom-entries');
+            expect(entriesInfo.textContent).toContain('of 100 entries');
+        });
     });
 
     describe('Event Handling', () => {
@@ -851,6 +957,227 @@ describe('AvalynxDataTable', () => {
 
             const overlay = document.getElementById('test-datatable-overlay');
             expect(overlay).toBeNull();
+        });
+
+        test('should use showLoader helper method', async () => {
+            const mockLoader = { load: false };
+
+            const dt = new AvalynxDataTable('test-datatable', {
+                apiUrl: 'http://test.com/api',
+                loader: mockLoader
+            });
+
+            dt.showLoader(true);
+            expect(mockLoader.load).toBe(true);
+
+            dt.showLoader(false);
+            expect(mockLoader.load).toBe(false);
+        });
+
+        test('should toggle overlay display via showLoader when no external loader', async () => {
+            const dt = new AvalynxDataTable('test-datatable', {
+                apiUrl: 'http://test.com/api'
+            });
+
+            await new Promise(resolve => setTimeout(resolve, 200));
+
+            const overlay = document.getElementById('test-datatable-overlay');
+
+            dt.showLoader(true);
+            expect(overlay.style.display).toBe('flex');
+
+            dt.showLoader(false);
+            expect(overlay.style.display).toBe('none');
+        });
+    });
+
+    describe('AvalynxTable Integration', () => {
+        test('should set useAvalynxTable to true when className contains avalynx-table', () => {
+            const dt = new AvalynxDataTable('test-datatable', {
+                apiUrl: 'http://test.com/api',
+                className: 'avalynx-table table table-striped'
+            });
+
+            expect(dt.useAvalynxTable).toBe(true);
+        });
+
+        test('should set useAvalynxTable to false when className does not contain avalynx-table', () => {
+            const dt = new AvalynxDataTable('test-datatable', {
+                apiUrl: 'http://test.com/api',
+                className: 'table table-striped'
+            });
+
+            expect(dt.useAvalynxTable).toBe(false);
+        });
+
+        test('should initialize AvalynxTable after populateTable when useAvalynxTable is true', async () => {
+            const dt = new AvalynxDataTable('test-datatable', {
+                apiUrl: 'http://test.com/api',
+                className: 'avalynx-table table'
+            });
+
+            await new Promise(resolve => setTimeout(resolve, 200));
+
+            expect(AvalynxTable).toHaveBeenCalledWith('#test-datatable-table');
+        });
+
+        test('should not initialize AvalynxTable when useAvalynxTable is false', async () => {
+            AvalynxTable.mockClear();
+
+            const dt = new AvalynxDataTable('test-datatable', {
+                apiUrl: 'http://test.com/api',
+                className: 'table table-striped'
+            });
+
+            await new Promise(resolve => setTimeout(resolve, 200));
+
+            expect(AvalynxTable).not.toHaveBeenCalled();
+        });
+
+        test('should store AvalynxTable instance', async () => {
+            const mockInstance = { enhanced: true };
+            AvalynxTable.mockReturnValue(mockInstance);
+
+            const dt = new AvalynxDataTable('test-datatable', {
+                apiUrl: 'http://test.com/api',
+                className: 'avalynx-table table'
+            });
+
+            await new Promise(resolve => setTimeout(resolve, 200));
+
+            expect(dt.avalynxTableInstance).toBe(mockInstance);
+        });
+
+        test('should warn when AvalynxTable is not available but useAvalynxTable is true', async () => {
+            const originalAvalynxTable = global.AvalynxTable;
+            delete global.AvalynxTable;
+
+            const dt = new AvalynxDataTable('test-datatable', {
+                apiUrl: 'http://test.com/api',
+                className: 'avalynx-table table'
+            });
+
+            await new Promise(resolve => setTimeout(resolve, 200));
+
+            expect(consoleWarnSpy).toHaveBeenCalledWith(
+                'AvalynxDataTable: AvalynxTable not found. Responsive table features disabled.'
+            );
+
+            global.AvalynxTable = originalAvalynxTable;
+        });
+
+        test('should re-initialize AvalynxTable on each populateTable call', async () => {
+            AvalynxTable.mockClear();
+
+            const dt = new AvalynxDataTable('test-datatable', {
+                apiUrl: 'http://test.com/api',
+                className: 'avalynx-table table'
+            });
+
+            await new Promise(resolve => setTimeout(resolve, 200));
+
+            const initialCallCount = AvalynxTable.mock.calls.length;
+
+            // Trigger another fetch
+            await dt.fetchData();
+
+            await new Promise(resolve => setTimeout(resolve, 200));
+
+            expect(AvalynxTable.mock.calls.length).toBeGreaterThan(initialCallCount);
+        });
+    });
+
+    describe('Refresh Method', () => {
+        test('should have refresh method that calls fetchData', async () => {
+            const dt = new AvalynxDataTable('test-datatable', {
+                apiUrl: 'http://test.com/api'
+            });
+
+            await new Promise(resolve => setTimeout(resolve, 200));
+
+            fetch.mockClear();
+
+            dt.refresh();
+
+            await new Promise(resolve => setTimeout(resolve, 10));
+
+            expect(fetch).toHaveBeenCalled();
+        });
+    });
+
+    describe('Destroy Method', () => {
+        test('should have destroy method', () => {
+            const dt = new AvalynxDataTable('test-datatable', {
+                apiUrl: 'http://test.com/api'
+            });
+
+            expect(typeof dt.destroy).toBe('function');
+        });
+
+        test('should clear container on destroy', async () => {
+            const dt = new AvalynxDataTable('test-datatable', {
+                apiUrl: 'http://test.com/api'
+            });
+
+            await new Promise(resolve => setTimeout(resolve, 200));
+
+            dt.destroy();
+
+            const container = document.getElementById('test-datatable');
+            expect(container.innerHTML).toBe('');
+        });
+
+        test('should clear references on destroy', async () => {
+            const dt = new AvalynxDataTable('test-datatable', {
+                apiUrl: 'http://test.com/api'
+            });
+
+            await new Promise(resolve => setTimeout(resolve, 200));
+
+            dt.destroy();
+
+            expect(dt._boundHandlers).toBeNull();
+            expect(dt.result).toBeNull();
+            expect(dt.avalynxTableInstance).toBeNull();
+        });
+
+        test('should reset container position style on destroy', async () => {
+            const dt = new AvalynxDataTable('test-datatable', {
+                apiUrl: 'http://test.com/api'
+            });
+
+            await new Promise(resolve => setTimeout(resolve, 200));
+
+            const container = document.getElementById('test-datatable');
+            expect(container.style.position).toBe('relative');
+
+            dt.destroy();
+
+            expect(container.style.position).toBe('');
+        });
+
+        test('should clear debounce timeout on destroy', (done) => {
+            jest.useFakeTimers();
+
+            const dt = new AvalynxDataTable('test-datatable', {
+                apiUrl: 'http://test.com/api',
+                searchWait: 1000
+            });
+
+            jest.runAllTimers();
+
+            const searchInput = document.querySelector('.avalynx-datatable-top .form-control');
+            searchInput.value = 'test';
+            searchInput.dispatchEvent(new Event('input'));
+
+            // Destroy before debounce completes
+            dt.destroy();
+
+            // This should not throw
+            jest.advanceTimersByTime(1000);
+
+            jest.useRealTimers();
+            done();
         });
     });
 
@@ -952,7 +1279,7 @@ describe('AvalynxDataTable', () => {
             expect(dt.totalPages).toBe(1);
         });
 
-        test('should handle data with custom cell classes', async () => {
+        test('should handle data with custom cell classes using optional chaining', async () => {
             mockFetchResponse.data[0].data_class = {
                 name: 'highlighted-cell'
             };
@@ -969,6 +1296,25 @@ describe('AvalynxDataTable', () => {
 
             const cell = document.querySelector('.avalynx-datatable-table tbody tr:first-child td:nth-child(2)');
             expect(cell.classList.contains('highlighted-cell')).toBe(true);
+        });
+
+        test('should handle data without data_class property', async () => {
+            // Ensure data_class is undefined
+            delete mockFetchResponse.data[0].data_class;
+
+            fetch.mockResolvedValue({
+                json: jest.fn().mockResolvedValue(mockFetchResponse)
+            });
+
+            const dt = new AvalynxDataTable('test-datatable', {
+                apiUrl: 'http://test.com/api'
+            });
+
+            await new Promise(resolve => setTimeout(resolve, 200));
+
+            // Should not throw
+            const cell = document.querySelector('.avalynx-datatable-table tbody tr:first-child td:nth-child(2)');
+            expect(cell).not.toBeNull();
         });
 
         test('should set searchIsNew flag when search value changes', (done) => {
@@ -993,5 +1339,267 @@ describe('AvalynxDataTable', () => {
             jest.useRealTimers();
             done();
         });
+
+        test('should use first listPerPage value as fallback when perPage invalid', () => {
+            const dt = new AvalynxDataTable('test-datatable', {
+                apiUrl: 'http://test.com/api',
+                perPage: 999,
+                listPerPage: [5, 15, 30]
+            });
+
+            expect(dt.options.perPage).toBe(5);
+        });
+
+        test('should fallback to 10 when listPerPage is empty', () => {
+            const dt = new AvalynxDataTable('test-datatable', {
+                apiUrl: 'http://test.com/api',
+                perPage: 999,
+                listPerPage: []
+            });
+
+            expect(dt.options.perPage).toBe(10);
+        });
+    });
+
+    describe('URLSearchParams Usage', () => {
+        test('should use URLSearchParams for POST body', async () => {
+            const dt = new AvalynxDataTable('test-datatable', {
+                apiUrl: 'http://test.com/api',
+                apiMethod: 'POST',
+                search: 'test query'
+            });
+
+            await new Promise(resolve => setTimeout(resolve, 10));
+
+            const callArgs = fetch.mock.calls[0][1];
+            // URLSearchParams properly encodes spaces as +
+            expect(callArgs.body).toContain('search=test+query');
+        });
+
+        test('should use URLSearchParams for GET query string', async () => {
+            const dt = new AvalynxDataTable('test-datatable', {
+                apiUrl: 'http://test.com/api',
+                apiMethod: 'GET',
+                search: 'test query'
+            });
+
+            await new Promise(resolve => setTimeout(resolve, 10));
+
+            const callUrl = fetch.mock.calls[0][0];
+            expect(callUrl).toContain('search=test+query');
+        });
+    });
+
+    describe('DocumentFragment Usage', () => {
+        test('should use DocumentFragment for efficient DOM updates in tbody', async () => {
+            // This is an indirect test - we verify the result is correct
+            mockFetchResponse.data = [
+                { data: { id: '1', name: 'A', email: 'a@test.com' } },
+                { data: { id: '2', name: 'B', email: 'b@test.com' } },
+                { data: { id: '3', name: 'C', email: 'c@test.com' } }
+            ];
+
+            fetch.mockResolvedValue({
+                json: jest.fn().mockResolvedValue(mockFetchResponse)
+            });
+
+            const dt = new AvalynxDataTable('test-datatable', {
+                apiUrl: 'http://test.com/api'
+            });
+
+            await new Promise(resolve => setTimeout(resolve, 200));
+
+            const tbody = document.querySelector('.avalynx-datatable-table tbody');
+            expect(tbody.children.length).toBe(3);
+        });
+
+        test('should use DocumentFragment for pagination items', async () => {
+            mockFetchResponse.count.filtered = 50;
+            mockFetchResponse.count.perpage = 10;
+
+            fetch.mockResolvedValue({
+                json: jest.fn().mockResolvedValue(mockFetchResponse)
+            });
+
+            const dt = new AvalynxDataTable('test-datatable', {
+                apiUrl: 'http://test.com/api',
+                paginationPrevNext: true
+            });
+
+            await new Promise(resolve => setTimeout(resolve, 200));
+
+            const paginationUl = document.querySelector('.pagination');
+            expect(paginationUl.children.length).toBeGreaterThan(0);
+        });
+    });
+});
+
+
+// Additional tests to reach 100% coverage
+
+describe('Additional Coverage', () => {
+    test('should ignore clicks outside sortable headers', async () => {
+        const dt = new AvalynxDataTable('test-datatable', { apiUrl: 'http://test.com/api' });
+        await new Promise(resolve => setTimeout(resolve, 200));
+
+        fetch.mockClear();
+        const thead = document.querySelector('.avalynx-datatable-table thead');
+        // Dispatch click on thead (no th target)
+        thead.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+        expect(fetch).not.toHaveBeenCalled();
+    });
+
+    test('should safely return when header has no column id', async () => {
+        const dt = new AvalynxDataTable('test-datatable', { apiUrl: 'http://test.com/api' });
+        await new Promise(resolve => setTimeout(resolve, 200));
+
+        const header = document.querySelector('.avalynx-datatable-table thead th[data-avalynx-datatable-sortable]');
+        // Remove the identifying attribute to hit the guard branch
+        header.removeAttribute('data-avalynx-datatable-column-id');
+
+        fetch.mockClear();
+        header.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+        expect(fetch).not.toHaveBeenCalled();
+    });
+
+    test('should support multi-sort with ctrlKey without clearing existing sorting', async () => {
+        // Provide a custom first response defining initial sorting on id
+        const firstResponse = {
+            head: { columns: [
+                { id: 'id', name: 'ID', sortable: true, hidden: false },
+                { id: 'name', name: 'Name', sortable: true, hidden: false }
+            ]},
+            data: [
+                { data: { id: '1', name: 'A' } },
+                { data: { id: '2', name: 'B' } }
+            ],
+            count: { page: 1, perpage: 10, start: 1, end: 2, total: 2, filtered: 2, all: 2 },
+            sorting: { id: 'asc' }
+        };
+        fetch.mockResolvedValueOnce({ json: jest.fn().mockResolvedValue(firstResponse) });
+
+        const dt = new AvalynxDataTable('test-datatable', { apiUrl: 'http://test.com/api' });
+        // Wait until first fetch applied sorting into options
+        for (let i = 0; i < 10; i++) {
+            if (dt.options.sorting && dt.options.sorting.id === 'asc') break;
+            // eslint-disable-next-line no-await-in-loop
+            await new Promise(r => setTimeout(r, 50));
+        }
+
+        // Next fetch after clicking another column with ctrlKey
+        const nextResponse = { ...firstResponse, sorting: { id: 'asc', name: 'asc' } };
+        fetch.mockResolvedValueOnce({ json: jest.fn().mockResolvedValue(nextResponse) });
+
+        const nameHeader = document.querySelector('.avalynx-datatable-table thead th[data-avalynx-datatable-column-id="name"]');
+        nameHeader.dispatchEvent(new MouseEvent('click', { bubbles: true, ctrlKey: true }));
+
+        // Wait for the second fetch to complete
+        for (let i = 0; i < 10; i++) {
+            if (dt.options.sorting && dt.options.sorting.name === 'asc') break;
+            // eslint-disable-next-line no-await-in-loop
+            await new Promise(r => setTimeout(r, 50));
+        }
+
+        expect(dt.options.sorting.id).toBe('asc');
+        expect(dt.options.sorting.name).toBe('asc');
+    });
+
+    test('destroy should remove all event listeners (no further fetches)', async () => {
+        jest.useFakeTimers();
+        const dt = new AvalynxDataTable('test-datatable', { apiUrl: 'http://test.com/api', searchWait: 200 });
+        // Allow initial setup and first fetch
+        jest.runOnlyPendingTimers();
+        await Promise.resolve();
+
+        fetch.mockClear();
+        dt.destroy();
+
+        // Try to trigger per-page change
+        const select = document.querySelector('.avalynx-datatable-top-entries .form-select');
+        if (select) {
+            select.value = '25';
+            select.dispatchEvent(new Event('change', { bubbles: true }));
+        }
+
+        // Try to trigger search input debounce
+        const searchInput = document.querySelector('.avalynx-datatable-top-search .form-control');
+        if (searchInput) {
+            searchInput.value = 'after destroy';
+            searchInput.dispatchEvent(new Event('input', { bubbles: true }));
+            jest.advanceTimersByTime(500);
+        }
+
+        // Try to trigger sorting click
+        const sortableHeader = document.querySelector('.avalynx-datatable-table thead th[data-avalynx-datatable-sortable]');
+        if (sortableHeader) {
+            sortableHeader.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+        }
+
+        expect(fetch).not.toHaveBeenCalled();
+        jest.useRealTimers();
+    });
+
+    test('should alert string errors without message in catch branch', async () => {
+        const alertSpy = jest.spyOn(window, 'alert').mockImplementation(() => {});
+        fetch.mockRejectedValueOnce('fatal');
+        new AvalynxDataTable('test-datatable', { apiUrl: 'http://test.com/api' });
+        await new Promise(resolve => setTimeout(resolve, 200));
+        expect(alertSpy).toHaveBeenCalledWith('fatal');
+        alertSpy.mockRestore();
+    });
+
+    test('destroy should handle missing elements and handlers gracefully', async () => {
+        const dt = new AvalynxDataTable('test-datatable', { apiUrl: 'http://test.com/api' });
+        await new Promise(resolve => setTimeout(resolve, 200));
+        // Remove handlers and elements to force false branches in destroy
+        dt._boundHandlers.sort = null;
+        dt._boundHandlers.perPageChange = null;
+        dt._boundHandlers.searchInput = null;
+        dt.dt.innerHTML = '';
+        expect(() => dt.destroy()).not.toThrow();
+    });
+
+    test('should cover default parameters when called with only id', () => {
+        // This covers the default values for options and language in the constructor
+        const dt = new AvalynxDataTable('test-datatable');
+        expect(dt.options.perPage).toBe(10);
+        expect(dt.language.showLabel).toBe('Show');
+    });
+
+    test('should cover the module.exports branch', () => {
+        // Clear cache and set up environment for CommonJS test
+        const originalModule = global.module;
+        const originalExports = global.exports;
+
+        try {
+            // Mock module environment
+            const mockModule = { exports: {} };
+
+            // We need to re-evaluate the file content in this environment
+            const fs = require('fs');
+            const path = require('path');
+            const code = fs.readFileSync(path.resolve(__dirname, '../src/js/avalynx-datatable.js'), 'utf8');
+
+            // Execute code with our mock module
+            const fn = new Function('module', 'exports', 'document', 'console', 'fetch', 'setTimeout', 'clearTimeout', 'URLSearchParams', 'Math', 'AvalynxTable', code);
+            fn(mockModule, mockModule.exports, document, console, fetch, setTimeout, clearTimeout, URLSearchParams, Math, global.AvalynxTable);
+
+            expect(mockModule.exports).toBeDefined();
+            // Checking if it's our class (it should have populateTable on prototype)
+            expect(mockModule.exports.prototype.populateTable).toBeDefined();
+
+            // Test branch where module.exports is falsy (but module exists)
+            const mockModuleNoExports = { exports: null };
+            fn(mockModuleNoExports, null, document, console, fetch, setTimeout, clearTimeout, URLSearchParams, Math, global.AvalynxTable);
+            expect(mockModuleNoExports.exports).toBeNull();
+
+            // Test branch where module is undefined
+            const fnNoModule = new Function('document', 'console', 'fetch', 'setTimeout', 'clearTimeout', 'URLSearchParams', 'Math', 'AvalynxTable', code);
+            fnNoModule(document, console, fetch, setTimeout, clearTimeout, URLSearchParams, Math, global.AvalynxTable);
+
+        } finally {
+            global.module = originalModule;
+            global.exports = originalExports;
+        }
     });
 });

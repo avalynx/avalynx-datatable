@@ -3,7 +3,7 @@
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>DataTable with slow response | AvalynxDataTable Example</title>
+	<title>DataTable with AvalynxLoader &amp; AvalynxTable Integration | AvalynxDataTable Example</title>
 
 	<!-- Bootstrap 5.3 -->
 	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -18,6 +18,10 @@
 
     <!-- AvalynxLoader 1.0.1 -->
     <script src="https://cdn.jsdelivr.net/npm/avalynx-loader@1.0.1/dist/js/avalynx-loader.min.js"></script>
+
+    <!-- AvalynxTable 1.0.1 -->
+    <link href="https://cdn.jsdelivr.net/npm/avalynx-table@1.0.1/dist/css/avalynx-table.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/avalynx-table@1.0.1/dist/js/avalynx-table.min.js"></script>
 
     <!-- AvalynxDataTable -->
     <link href="../src/css/avalynx-datatable.css" rel="stylesheet">
@@ -40,20 +44,21 @@
 	<div class="container" id="avalynx-datatable"></div>
 	<br/>
 	<br/>
-	<div class="alert alert-info">
-		This is an example of the AvalynxDataTable. It is a simple table with some random data. The table is sortable, searchable and paginated. The data is fetched from a PHP script.
-	</div>
+    <div class="alert alert-info">
+        <strong>AvalynxLoader &amp; AvalynxTable Integration:</strong> This example demonstrates the seamless integration of <code>AvalynxLoader</code> (custom loading spinner) and <code>AvalynxTable</code> (responsive stacking on mobile breakpoints) with AvalynxDataTable.
+    </div>
 
 	<script>
 
 		new AvalynxDataTable("avalynx-datatable", {
-			apiUrl: "php/result-slow.php",
+			apiUrl: "php/result.php",
 			perPage: 10,
 			search: "",
 			sorting: {
 				"name": "asc",
 				"age": "desc"
 			},
+            className: "avalynx-table avalynx-table-md table table-striped table-bordered table-responsive align-middle",
             loader: new AvalynxLoader('#avalynx-datatable', {
                 className: 'spinner-border text-danger',
             })
@@ -65,13 +70,17 @@
 	<h3>Source of example<a class="p-1 float-end btn btn-secondary btn-small" id="copyButton">Copy to clipboard</a></h3>
 	<pre><code class="language-javascript" id="codeBlock">
 new AvalynxDataTable("avalynx-datatable", {
-	apiUrl: "result-slow.php",
+	apiUrl: "php/result.php",
 	perPage: 10,
 	search: "",
 	sorting: {
 		"name": "asc",
 		"age": "desc"
-	}
+	},
+	className: "avalynx-table avalynx-table-md table table-striped table-bordered table-responsive align-middle",
+	loader: new AvalynxLoader('#avalynx-datatable', {
+		className: 'spinner-border text-danger',
+	})
 }, {});
 	</code></pre>
 
