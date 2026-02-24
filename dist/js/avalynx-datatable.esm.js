@@ -485,3 +485,7 @@ export class AvalynxDataTable {
         this.avalynxTableInstance = null;
     }
 }
+/* istanbul ignore next */
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = AvalynxDataTable;
+}

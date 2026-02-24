@@ -1,5 +1,13 @@
 # AvalynxDataTable
 
+[![npm version](https://img.shields.io/npm/v/avalynx-datatable)](https://www.npmjs.com/package/avalynx-datatable)
+[![npm downloads](https://img.shields.io/npm/dt/avalynx-datatable)](https://www.npmjs.com/package/avalynx-datatable)
+[![jsDelivr](https://img.shields.io/jsdelivr/npm/hm/avalynx-datatable)](https://www.jsdelivr.com/package/npm/avalynx-datatable)
+[![License](https://img.shields.io/npm/l/avalynx-datatable)](LICENSE)
+[![Tests](https://github.com/avalynx/avalynx-datatable/actions/workflows/tests.yml/badge.svg?branch=main)](https://github.com/avalynx/avalynx-datatable/actions/workflows/tests.yml)
+[![codecov](https://codecov.io/gh/avalynx/avalynx-datatable/branch/main/graph/badge.svg)](https://codecov.io/gh/avalynx/avalynx-datatable)
+[![GitHub stars](https://img.shields.io/github/stars/avalynx/avalynx-datatable?style=flat&logo=github)](https://github.com/avalynx/avalynx-datatable)
+
 AvalynxDataTable is a simple, lightweight, and customizable data table component for web applications. It is designed to be used with Bootstrap version 5.3 or higher and does not require any framework dependencies.
 
 ## Features
@@ -19,6 +27,7 @@ Here's a simple example of how to use AvalynxDataTable in your project:
 * [DataTable](https://avalynx-datatable.jbs-newmedia.de/examples/datatable.html)
 * [DataTable with slow response](https://avalynx-datatable.jbs-newmedia.de/examples/datatable-slow-response.html)
 * [DataTable multiple instances](https://avalynx-datatable.jbs-newmedia.de/examples/datatable-multiple-instances.html)
+* [DataTable with AvalynxLoader & AvalynxTable Integration](https://avalynx-datatable.jbs-newmedia.de/examples/datatable-loader-table-integration.html)
 
 ## Installation
 
@@ -46,8 +55,8 @@ Replace `path/to/avalynx-datatable.js` and `path/to/avalynx-datatable.css` with 
 AvalynxDataTable is also available via [jsDelivr](https://www.jsdelivr.com/). You can include it in your project like this:
 
 ```html
-<link href="https://cdn.jsdelivr.net/npm/avalynx-datatable@1.0.1/dist/css/avalynx-datatable.min.css" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/avalynx-datatable@1.0.1/dist/js/avalynx-datatable.min.js"></script>
+<link href="https://cdn.jsdelivr.net/npm/avalynx-datatable@1.0.2/dist/css/avalynx-datatable.min.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/avalynx-datatable@1.0.2/dist/js/avalynx-datatable.min.js"></script>
 ```
 
 Make sure to also include Bootstrap's JS/CSS in your project to ensure AvalynxDataTable displays correctly.
@@ -130,15 +139,37 @@ new AvalynxDataTable("avalynx-datatable", {
     "age": "desc"
   }
 }, {
-  showLabel: "Zeige",
-  entriesLabel: "Einträge",
-  searchLabel: "Suche",
-  previousLabel: "Zurück",
-  nextLabel: "Weiter",
-  showingEntries: (start, end, total) => `Zeige ${start} bis ${end} von ${total} Einträgen`,
-  showingFilteredEntries: (start, end, filtered, total) => `Zeige ${start} bis ${end} von ${filtered} Einträgen (gefiltert von ${total} Einträgen)`
+  showLabel: "Show",
+  entriesLabel: "entries",
+  searchLabel: "Search",
+  previousLabel: "Previous",
+  nextLabel: "Next",
+  showingEntries: (start, end, total) => `Showing ${start} to ${end} of ${total} entries`,
+  showingFilteredEntries: (start, end, filtered, total) => `Showing ${start} to ${end} of ${filtered} entries (filtered from ${total} total entries)`
 });
 ```
+
+## Language Reference
+
+The default English labels are:
+
+- `showLabel`: `'Show'`
+- `entriesLabel`: `'entries'`
+- `searchLabel`: `'Search'`
+- `previousLabel`: `'Previous'`
+- `nextLabel`: `'Next'`
+- `showingEntries`: `(start, end, total) => 'Showing ${start} to ${end} of ${total} entries'`
+- `showingFilteredEntries`: `(start, end, filtered, total) => 'Showing ${start} to ${end} of ${filtered} entries (filtered from ${total} total entries)'`
+
+For German, you can use:
+
+- `showLabel`: `'Zeige'`
+- `entriesLabel`: `'Einträge'`
+- `searchLabel`: `'Suche'`
+- `previousLabel`: `'Zurück'`
+- `nextLabel`: `'Weiter'`
+- `showingEntries`: `(start, end, total) => 'Zeige ${start} bis ${end} von ${total} Einträgen'`
+- `showingFilteredEntries`: `(start, end, filtered, total) => 'Zeige ${start} bis ${end} von ${filtered} Einträgen (gefiltert von ${total} Einträgen)'`
 
 ## JSON Data Structure
 

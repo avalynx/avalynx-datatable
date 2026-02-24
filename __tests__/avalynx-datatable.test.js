@@ -1433,3 +1433,173 @@ describe('AvalynxDataTable', () => {
         });
     });
 });
+
+
+// Additional tests to reach 100% coverage
+
+describe('Additional Coverage', () => {
+    test('should ignore clicks outside sortable headers', async () => {
+        const dt = new AvalynxDataTable('test-datatable', { apiUrl: 'http://test.com/api' });
+        await new Promise(resolve => setTimeout(resolve, 200));
+
+        fetch.mockClear();
+        const thead = document.querySelector('.avalynx-datatable-table thead');
+        // Dispatch click on thead (no th target)
+        thead.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+        expect(fetch).not.toHaveBeenCalled();
+    });
+
+    test('should safely return when header has no column id', async () => {
+        const dt = new AvalynxDataTable('test-datatable', { apiUrl: 'http://test.com/api' });
+        await new Promise(resolve => setTimeout(resolve, 200));
+
+        const header = document.querySelector('.avalynx-datatable-table thead th[data-avalynx-datatable-sortable]');
+        // Remove the identifying attribute to hit the guard branch
+        header.removeAttribute('data-avalynx-datatable-column-id');
+
+        fetch.mockClear();
+        header.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+        expect(fetch).not.toHaveBeenCalled();
+    });
+
+    test('should support multi-sort with ctrlKey without clearing existing sorting', async () => {
+        // Provide a custom first response defining initial sorting on id
+        const firstResponse = {
+            head: { columns: [
+                { id: 'id', name: 'ID', sortable: true, hidden: false },
+                { id: 'name', name: 'Name', sortable: true, hidden: false }
+            ]},
+            data: [
+                { data: { id: '1', name: 'A' } },
+                { data: { id: '2', name: 'B' } }
+            ],
+            count: { page: 1, perpage: 10, start: 1, end: 2, total: 2, filtered: 2, all: 2 },
+            sorting: { id: 'asc' }
+        };
+        fetch.mockResolvedValueOnce({ json: jest.fn().mockResolvedValue(firstResponse) });
+
+        const dt = new AvalynxDataTable('test-datatable', { apiUrl: 'http://test.com/api' });
+        // Wait until first fetch applied sorting into options
+        for (let i = 0; i < 10; i++) {
+            if (dt.options.sorting && dt.options.sorting.id === 'asc') break;
+            // eslint-disable-next-line no-await-in-loop
+            await new Promise(r => setTimeout(r, 50));
+        }
+
+        // Next fetch after clicking another column with ctrlKey
+        const nextResponse = { ...firstResponse, sorting: { id: 'asc', name: 'asc' } };
+        fetch.mockResolvedValueOnce({ json: jest.fn().mockResolvedValue(nextResponse) });
+
+        const nameHeader = document.querySelector('.avalynx-datatable-table thead th[data-avalynx-datatable-column-id="name"]');
+        nameHeader.dispatchEvent(new MouseEvent('click', { bubbles: true, ctrlKey: true }));
+
+        // Wait for the second fetch to complete
+        for (let i = 0; i < 10; i++) {
+            if (dt.options.sorting && dt.options.sorting.name === 'asc') break;
+            // eslint-disable-next-line no-await-in-loop
+            await new Promise(r => setTimeout(r, 50));
+        }
+
+        expect(dt.options.sorting.id).toBe('asc');
+        expect(dt.options.sorting.name).toBe('asc');
+    });
+
+    test('destroy should remove all event listeners (no further fetches)', async () => {
+        jest.useFakeTimers();
+        const dt = new AvalynxDataTable('test-datatable', { apiUrl: 'http://test.com/api', searchWait: 200 });
+        // Allow initial setup and first fetch
+        jest.runOnlyPendingTimers();
+        await Promise.resolve();
+
+        fetch.mockClear();
+        dt.destroy();
+
+        // Try to trigger per-page change
+        const select = document.querySelector('.avalynx-datatable-top-entries .form-select');
+        if (select) {
+            select.value = '25';
+            select.dispatchEvent(new Event('change', { bubbles: true }));
+        }
+
+        // Try to trigger search input debounce
+        const searchInput = document.querySelector('.avalynx-datatable-top-search .form-control');
+        if (searchInput) {
+            searchInput.value = 'after destroy';
+            searchInput.dispatchEvent(new Event('input', { bubbles: true }));
+            jest.advanceTimersByTime(500);
+        }
+
+        // Try to trigger sorting click
+        const sortableHeader = document.querySelector('.avalynx-datatable-table thead th[data-avalynx-datatable-sortable]');
+        if (sortableHeader) {
+            sortableHeader.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+        }
+
+        expect(fetch).not.toHaveBeenCalled();
+        jest.useRealTimers();
+    });
+
+    test('should alert string errors without message in catch branch', async () => {
+        const alertSpy = jest.spyOn(window, 'alert').mockImplementation(() => {});
+        fetch.mockRejectedValueOnce('fatal');
+        new AvalynxDataTable('test-datatable', { apiUrl: 'http://test.com/api' });
+        await new Promise(resolve => setTimeout(resolve, 200));
+        expect(alertSpy).toHaveBeenCalledWith('fatal');
+        alertSpy.mockRestore();
+    });
+
+    test('destroy should handle missing elements and handlers gracefully', async () => {
+        const dt = new AvalynxDataTable('test-datatable', { apiUrl: 'http://test.com/api' });
+        await new Promise(resolve => setTimeout(resolve, 200));
+        // Remove handlers and elements to force false branches in destroy
+        dt._boundHandlers.sort = null;
+        dt._boundHandlers.perPageChange = null;
+        dt._boundHandlers.searchInput = null;
+        dt.dt.innerHTML = '';
+        expect(() => dt.destroy()).not.toThrow();
+    });
+
+    test('should cover default parameters when called with only id', () => {
+        // This covers the default values for options and language in the constructor
+        const dt = new AvalynxDataTable('test-datatable');
+        expect(dt.options.perPage).toBe(10);
+        expect(dt.language.showLabel).toBe('Show');
+    });
+
+    test('should cover the module.exports branch', () => {
+        // Clear cache and set up environment for CommonJS test
+        const originalModule = global.module;
+        const originalExports = global.exports;
+
+        try {
+            // Mock module environment
+            const mockModule = { exports: {} };
+
+            // We need to re-evaluate the file content in this environment
+            const fs = require('fs');
+            const path = require('path');
+            const code = fs.readFileSync(path.resolve(__dirname, '../src/js/avalynx-datatable.js'), 'utf8');
+
+            // Execute code with our mock module
+            const fn = new Function('module', 'exports', 'document', 'console', 'fetch', 'setTimeout', 'clearTimeout', 'URLSearchParams', 'Math', 'AvalynxTable', code);
+            fn(mockModule, mockModule.exports, document, console, fetch, setTimeout, clearTimeout, URLSearchParams, Math, global.AvalynxTable);
+
+            expect(mockModule.exports).toBeDefined();
+            // Checking if it's our class (it should have populateTable on prototype)
+            expect(mockModule.exports.prototype.populateTable).toBeDefined();
+
+            // Test branch where module.exports is falsy (but module exists)
+            const mockModuleNoExports = { exports: null };
+            fn(mockModuleNoExports, null, document, console, fetch, setTimeout, clearTimeout, URLSearchParams, Math, global.AvalynxTable);
+            expect(mockModuleNoExports.exports).toBeNull();
+
+            // Test branch where module is undefined
+            const fnNoModule = new Function('document', 'console', 'fetch', 'setTimeout', 'clearTimeout', 'URLSearchParams', 'Math', 'AvalynxTable', code);
+            fnNoModule(document, console, fetch, setTimeout, clearTimeout, URLSearchParams, Math, global.AvalynxTable);
+
+        } finally {
+            global.module = originalModule;
+            global.exports = originalExports;
+        }
+    });
+});

@@ -70,14 +70,17 @@
 	<h3>Source of example<a class="p-1 float-end btn btn-secondary btn-small" id="copyButton">Copy to clipboard</a></h3>
 	<pre><code class="language-javascript" id="codeBlock">
 new AvalynxDataTable("avalynx-datatable", {
-	apiUrl: "result.php",
+	apiUrl: "php/result.php",
 	perPage: 10,
 	search: "",
-	className: "avalynx-table avalynx-table-md table table-striped table-bordered table-responsive align-middle",
 	sorting: {
 		"name": "asc",
 		"age": "desc"
-	}
+	},
+	className: "avalynx-table avalynx-table-md table table-striped table-bordered table-responsive align-middle",
+	loader: new AvalynxLoader('#avalynx-datatable', {
+		className: 'spinner-border text-danger',
+	})
 }, {});
 	</code></pre>
 
