@@ -94,6 +94,7 @@ describe('AvalynxDataTable', () => {
             expect(dt.options.listPerPage).toEqual([10, 25, 50, 100]);
             expect(dt.options.paginationPrevNext).toBe(true);
             expect(dt.options.paginationRange).toBe(2);
+            expect(dt.options.md).toBe('md');
         });
 
         test('should merge custom options with defaults', () => {
@@ -206,6 +207,37 @@ describe('AvalynxDataTable', () => {
             expect(topSection).not.toBeNull();
             expect(perPageSelect).not.toBeNull();
             expect(searchInput).not.toBeNull();
+        });
+
+        test('should apply default md breakpoint class to top and bottom sections', async () => {
+            new AvalynxDataTable('test-datatable', { apiUrl: 'http://test.com/api' });
+
+            await new Promise(resolve => setTimeout(resolve, 10));
+
+            const container = document.getElementById('test-datatable');
+            const topSection = container.querySelector('.avalynx-datatable-top');
+            const bottomSection = container.querySelector('.avalynx-datatable-bottom');
+
+            expect(topSection.classList.contains('flex-md-row')).toBe(true);
+            expect(bottomSection.classList.contains('flex-md-row')).toBe(true);
+        });
+
+        test('should apply custom breakpoint class to top and bottom sections', async () => {
+            new AvalynxDataTable('test-datatable', {
+                apiUrl: 'http://test.com/api',
+                md: 'lg'
+            });
+
+            await new Promise(resolve => setTimeout(resolve, 10));
+
+            const container = document.getElementById('test-datatable');
+            const topSection = container.querySelector('.avalynx-datatable-top');
+            const bottomSection = container.querySelector('.avalynx-datatable-bottom');
+
+            expect(topSection.classList.contains('flex-lg-row')).toBe(true);
+            expect(bottomSection.classList.contains('flex-lg-row')).toBe(true);
+            expect(topSection.classList.contains('flex-md-row')).toBe(false);
+            expect(bottomSection.classList.contains('flex-md-row')).toBe(false);
         });
 
         test('should create table with proper structure and ID', async () => {
