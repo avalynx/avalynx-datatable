@@ -94,7 +94,7 @@ describe('AvalynxDataTable', () => {
             expect(dt.options.listPerPage).toEqual([10, 25, 50, 100]);
             expect(dt.options.paginationPrevNext).toBe(true);
             expect(dt.options.paginationRange).toBe(2);
-            expect(dt.options.md).toBe('md');
+            expect(dt.options.breakpoint).toBe('md');
         });
 
         test('should merge custom options with defaults', () => {
@@ -209,7 +209,7 @@ describe('AvalynxDataTable', () => {
             expect(searchInput).not.toBeNull();
         });
 
-        test('should apply default md breakpoint class to top and bottom sections', async () => {
+        test('should apply default breakpoint class to top and bottom sections', async () => {
             new AvalynxDataTable('test-datatable', { apiUrl: 'http://test.com/api' });
 
             await new Promise(resolve => setTimeout(resolve, 10));
@@ -225,7 +225,7 @@ describe('AvalynxDataTable', () => {
         test('should apply custom breakpoint class to top and bottom sections', async () => {
             new AvalynxDataTable('test-datatable', {
                 apiUrl: 'http://test.com/api',
-                md: 'lg'
+                breakpoint: 'lg'
             });
 
             await new Promise(resolve => setTimeout(resolve, 10));

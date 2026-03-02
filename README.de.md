@@ -55,8 +55,8 @@ Ersetzen Sie `path/to/avalynx-datatable.js` und `path/to/avalynx-datatable.css` 
 AvalynxDataTable ist auch über [jsDelivr](https://www.jsdelivr.com/) verfügbar. Sie können es so in Ihr Projekt einbinden:
 
 ```html
-<link href="https://cdn.jsdelivr.net/npm/avalynx-datatable@1.0.3/dist/css/avalynx-datatable.min.css" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/avalynx-datatable@1.0.3/dist/js/avalynx-datatable.min.js"></script>
+<link href="https://cdn.jsdelivr.net/npm/avalynx-datatable@1.0.4/dist/css/avalynx-datatable.min.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/avalynx-datatable@1.0.4/dist/js/avalynx-datatable.min.js"></script>
 ```
 
 Stellen Sie sicher, dass Sie auch die JS/CSS-Dateien von Bootstrap in Ihr Projekt einbinden, damit AvalynxDataTable korrekt angezeigt wird.
@@ -134,6 +134,7 @@ new AvalynxDataTable("avalynx-datatable", {
   apiUrl: "result.php",
   perPage: 10,
   search: "",
+  breakpoint: "md",
   sorting: {
     "name": "asc",
     "age": "desc"
@@ -275,6 +276,7 @@ AvalynxDataTable ermöglicht die folgenden Optionen zur Anpassung:
   - `listPerPage` (array): Die Liste der Optionen für das Pro-Seite-Dropdown (Standard: `[10, 25, 50, 100]`).
   - `perPage` (number): Die anfängliche Anzahl der Elemente pro Seite (Standard: `10`).
   - `className` (string): Die CSS-Klassen, die auf die Tabelle angewendet werden sollen (Standard: `'table table-striped table-bordered table-responsive'`).
+  - `breakpoint` (string): Bootstrap-Breakpoint für das Top/Bottom-Layout (`flex-{breakpoint}-row`, Standard: `'md'`).
   - `paginationPrevNext` (boolean): Ob die Vorherige- und Nächste-Buttons in der Pagination angezeigt werden sollen (Standard: `true`).
   - `paginationRange` (number): Die Anzahl der Seiten, die auf jeder Seite der aktuellen Seite in der Pagination angezeigt werden sollen (Standard: `2`).
   - `loader` (object): Eine Instanz von AvalynxLoader, die als Loader für die Tabelle verwendet werden soll (Standard: `null`).  
