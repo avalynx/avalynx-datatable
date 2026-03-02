@@ -22,6 +22,7 @@
  * @param {array} options.listPerPage - The list of options for the per-page dropdown (default: [10, 25, 50, 100]).
  * @param {number} options.perPage - The initial number of items per page (default: 10).
  * @param {string} options.className - The CSS classes to apply to the table (default: 'table table-striped table-bordered table-responsive').
+ * @param {string} options.md - Bootstrap breakpoint used for top/bottom row layout (default: 'md').
  * @param {boolean} options.paginationPrevNext - Whether to show the previous and next buttons in the pagination (default: true).
  * @param {number} options.paginationRange - The number of pages to show on either side of the current page in the pagination (default: 2).
  * @param {object} options.loader - An instance of AvalynxLoader to use as the loader for the table (default: null).
@@ -56,6 +57,7 @@ class AvalynxDataTable {
             listPerPage: [10, 25, 50, 100],
             perPage: 10,
             className: 'table table-striped table-bordered table-responsive align-middle',
+            md: 'md',
             paginationPrevNext: true,
             paginationRange: 2,
             loader: null,
@@ -96,6 +98,10 @@ class AvalynxDataTable {
         const topTemplate = document.getElementById("avalynx-datatable-top").content.cloneNode(true);
         const tableTemplate = document.getElementById("avalynx-datatable-table").content.cloneNode(true);
         const bottomTemplate = document.getElementById("avalynx-datatable-bottom").content.cloneNode(true);
+
+        const responsiveClass = `flex-${this.options.md}-row`;
+        topTemplate.querySelector(".avalynx-datatable-top").classList.add(responsiveClass);
+        bottomTemplate.querySelector(".avalynx-datatable-bottom").classList.add(responsiveClass);
 
         const table = tableTemplate.querySelector("table");
         table.className = `${this.options.className} avalynx-datatable-table`;
@@ -191,7 +197,7 @@ class AvalynxDataTable {
     ensureTemplatesExist() {
         const templates = {
             "avalynx-datatable-top": `
-                <div class="d-flex flex-column flex-md-row avalynx-datatable-top">
+                <div class="d-flex flex-column avalynx-datatable-top">
                     <div class="d-flex align-self-center pb-2 avalynx-datatable-top-entries">
                         <label class="align-self-center"></label>
                         <div class="align-self-center px-2">
@@ -211,7 +217,7 @@ class AvalynxDataTable {
                     <tbody></tbody>
                 </table>`,
             "avalynx-datatable-bottom": `
-                <div class="d-flex flex-column flex-md-row avalynx-datatable-bottom">
+                <div class="d-flex flex-column avalynx-datatable-bottom">
                     <div class="d-flex avalynx-datatable-bottom-entries pb-2"></div>
                     <div class="flex-grow-1"></div>
                     <nav class="align-self-center avalynx-datatable-bottom-pagination">
