@@ -1,12 +1,14 @@
 # AvalynxDataTable
 
-[![npm version](https://img.shields.io/npm/v/avalynx-datatable)](https://www.npmjs.com/package/avalynx-datatable)
-[![npm downloads](https://img.shields.io/npm/dt/avalynx-datatable)](https://www.npmjs.com/package/avalynx-datatable)
-[![jsDelivr](https://img.shields.io/jsdelivr/npm/hm/avalynx-datatable)](https://www.jsdelivr.com/package/npm/avalynx-datatable)
-[![License](https://img.shields.io/npm/l/avalynx-datatable)](LICENSE)
-[![Tests](https://github.com/avalynx/avalynx-datatable/actions/workflows/tests.yml/badge.svg?branch=main)](https://github.com/avalynx/avalynx-datatable/actions/workflows/tests.yml)
-[![codecov](https://codecov.io/gh/avalynx/avalynx-datatable/branch/main/graph/badge.svg)](https://codecov.io/gh/avalynx/avalynx-datatable)
-[![GitHub stars](https://img.shields.io/github/stars/avalynx/avalynx-datatable?style=flat&logo=github)](https://github.com/avalynx/avalynx-datatable)
+[![npm version](https://jbs-newmedia.de/badge/npm/avalynx-datatable/version.svg)](https://www.npmjs.com/package/avalynx-datatable)
+[![npm downloads](https://jbs-newmedia.de/badge/npm/avalynx-datatable/download.svg)](https://www.npmjs.com/package/avalynx-datatable)
+[![Composer version](https://jbs-newmedia.de/badge/composer/avalynx/avalynx-datatable/version.svg)](https://packagist.org/packages/avalynx/avalynx-datatable)
+[![Composer downloads](https://jbs-newmedia.de/badge/composer/avalynx/avalynx-datatable/download.svg)](https://packagist.org/packages/avalynx/avalynx-datatable)
+[![jsDelivr](https://jbs-newmedia.de/badge/jsdelivr/avalynx-datatable/hits.svg)](https://www.jsdelivr.com/package/npm/avalynx-datatable)
+[![License](https://jbs-newmedia.de/badge/npm/avalynx-datatable/license.svg)](LICENSE)
+[![Tests](https://jbs-newmedia.de/badge/github/avalynx/avalynx-datatable/tests.svg)](https://github.com/avalynx/avalynx-datatable/actions/workflows/tests.yml)
+[![codecov](https://jbs-newmedia.de/badge/codecov/avalynx/avalynx-datatable/coverage.svg)](https://codecov.io/gh/avalynx/avalynx-datatable)
+[![GitHub stars](https://jbs-newmedia.de/badge/github/avalynx/avalynx-datatable/stars.svg)](https://github.com/avalynx/avalynx-datatable)
 
 AvalynxDataTable is a simple, lightweight, and customizable data table component for web applications. It is designed to be used with Bootstrap version 5.3 or higher and does not require any framework dependencies.
 
@@ -19,7 +21,7 @@ AvalynxDataTable is a simple, lightweight, and customizable data table component
 - **Pagination**: Customizable pagination options including previous/next buttons and page range.
 - **Responsive**: Fully responsive design to work on various devices.
 
-## Example
+## Examples
 
 Here's a simple example of how to use AvalynxDataTable in your project:
 
@@ -55,8 +57,8 @@ Replace `path/to/avalynx-datatable.js` and `path/to/avalynx-datatable.css` with 
 AvalynxDataTable is also available via [jsDelivr](https://www.jsdelivr.com/). You can include it in your project like this:
 
 ```html
-<link href="https://cdn.jsdelivr.net/npm/avalynx-datatable@1.0.4/dist/css/avalynx-datatable.min.css" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/avalynx-datatable@1.0.4/dist/js/avalynx-datatable.min.js"></script>
+<link href="https://cdn.jsdelivr.net/npm/avalynx-datatable@1.0.5/dist/css/avalynx-datatable.min.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/avalynx-datatable@1.0.5/dist/js/avalynx-datatable.min.js"></script>
 ```
 
 Make sure to also include Bootstrap's JS/CSS in your project to ensure AvalynxDataTable displays correctly.

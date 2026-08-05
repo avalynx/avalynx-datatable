@@ -1,9 +1,9 @@
 /**
  * AvalynxDataTable
  *
- * A simple, lightweight, and customizable data table for the web. Based on Bootstrap >=5.3 without any framework dependencies.
+ * AvalynxDataTable is a simple, lightweight, and customizable data table for the web. Based on Bootstrap >=5.3 without any framework dependencies.
  *
- * @version 1.0.4
+ * @version 1.0.5
  * @license MIT
  * @author https://github.com/avalynx/avalynx-datatable/graphs/contributors
  * @website https://github.com/avalynx/
@@ -26,6 +26,7 @@
  * @param {boolean} options.paginationPrevNext - Whether to show the previous and next buttons in the pagination (default: true).
  * @param {number} options.paginationRange - The number of pages to show on either side of the current page in the pagination (default: 2).
  * @param {object} options.loader - An instance of AvalynxLoader to use as the loader for the table (default: null).
+ *
  * @param {object} language - An object containing the following keys:
  * @param {string} language.showLabel - The label for the per-page select (default: 'Show').
  * @param {string} language.entriesLabel - The label next to the per-page select indicating what the numbers represent (default: 'entries').

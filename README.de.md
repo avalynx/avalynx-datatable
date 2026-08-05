@@ -1,12 +1,12 @@
 # AvalynxDataTable
 
-[![npm version](https://img.shields.io/npm/v/avalynx-datatable)](https://www.npmjs.com/package/avalynx-datatable)
-[![npm downloads](https://img.shields.io/npm/dt/avalynx-datatable)](https://www.npmjs.com/package/avalynx-datatable)
-[![jsDelivr](https://img.shields.io/jsdelivr/npm/hm/avalynx-datatable)](https://www.jsdelivr.com/package/npm/avalynx-datatable)
-[![License](https://img.shields.io/npm/l/avalynx-datatable)](LICENSE)
-[![Tests](https://github.com/avalynx/avalynx-datatable/actions/workflows/tests.yml/badge.svg?branch=main)](https://github.com/avalynx/avalynx-datatable/actions/workflows/tests.yml)
-[![codecov](https://codecov.io/gh/avalynx/avalynx-datatable/branch/main/graph/badge.svg)](https://codecov.io/gh/avalynx/avalynx-datatable)
-[![GitHub stars](https://img.shields.io/github/stars/avalynx/avalynx-datatable?style=flat&logo=github)](https://github.com/avalynx/avalynx-datatable)
+[![npm version](https://jbs-newmedia.de/badge/npm/avalynx-datatable/version.svg)](https://www.npmjs.com/package/avalynx-datatable)
+[![npm downloads](https://jbs-newmedia.de/badge/npm/avalynx-datatable/download.svg)](https://www.npmjs.com/package/avalynx-datatable)
+[![jsDelivr](https://jbs-newmedia.de/badge/jsdelivr/avalynx-datatable/hits.svg)](https://www.jsdelivr.com/package/npm/avalynx-datatable)
+[![License](https://jbs-newmedia.de/badge/npm/avalynx-datatable/license.svg)](LICENSE)
+[![Tests](https://jbs-newmedia.de/badge/github/avalynx/avalynx-datatable/tests.svg)](https://github.com/avalynx/avalynx-datatable/actions/workflows/tests.yml)
+[![codecov](https://jbs-newmedia.de/badge/codecov/avalynx/avalynx-datatable/coverage.svg)](https://codecov.io/gh/avalynx/avalynx-datatable)
+[![GitHub stars](https://jbs-newmedia.de/badge/github/avalynx/avalynx-datatable/stars.svg)](https://github.com/avalynx/avalynx-datatable)
 
 AvalynxDataTable ist eine einfache, leichtgewichtige und anpassbare Datentabellen-Komponente für Webanwendungen. Sie wurde für die Verwendung mit Bootstrap Version 5.3 oder höher entwickelt und benötigt keine Framework-Abhängigkeiten.
 
@@ -19,9 +19,9 @@ AvalynxDataTable ist eine einfache, leichtgewichtige und anpassbare Datentabelle
 - **Pagination**: Anpassbare Pagination-Optionen, einschließlich Zurück/Weiter-Buttons und Seitenbereich.
 - **Responsive**: Vollständig responsives Design für verschiedene Geräte.
 
-## Beispiel
+## Beispiele
 
-Hier ist ein einfaches Beispiel, wie Sie AvalynxDataTable in Ihrem Projekt verwenden können:
+Hier ist ein einfaches Beispiel für die Verwendung von AvalynxDataTable in Ihrem Projekt:
 
 * [Übersicht](https://avalynx-datatable.jbs-newmedia.de/examples/index.html)
 * [DataTable](https://avalynx-datatable.jbs-newmedia.de/examples/datatable.html)
@@ -55,8 +55,8 @@ Ersetzen Sie `path/to/avalynx-datatable.js` und `path/to/avalynx-datatable.css` 
 AvalynxDataTable ist auch über [jsDelivr](https://www.jsdelivr.com/) verfügbar. Sie können es so in Ihr Projekt einbinden:
 
 ```html
-<link href="https://cdn.jsdelivr.net/npm/avalynx-datatable@1.0.4/dist/css/avalynx-datatable.min.css" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/avalynx-datatable@1.0.4/dist/js/avalynx-datatable.min.js"></script>
+<link href="https://cdn.jsdelivr.net/npm/avalynx-datatable@1.0.5/dist/css/avalynx-datatable.min.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/avalynx-datatable@1.0.5/dist/js/avalynx-datatable.min.js"></script>
 ```
 
 Stellen Sie sicher, dass Sie auch die JS/CSS-Dateien von Bootstrap in Ihr Projekt einbinden, damit AvalynxDataTable korrekt angezeigt wird.
@@ -299,7 +299,7 @@ Bleiben Sie dran für Updates und zögern Sie nicht, Ideen oder Vorschläge übe
 
 ## Beitragen
 
-Beiträge sind willkommen! Wenn Sie einen Beitrag leisten möchten, forken Sie bitte das Repository und senden Sie einen Pull-Request mit Ihren Änderungen oder Verbesserungen. Wir suchen nach Beiträgen in den folgenden Bereichen:
+Beiträge sind willkommen! Wenn Sie etwas beitragen möchten, forken Sie bitte das Repository und senden Sie einen Pull-Request mit Ihren Änderungen oder Verbesserungen. Wir suchen Beiträge in den folgenden Bereichen:
 
 - Fehlerbehebungen
 - Funktionserweiterungen
@@ -313,6 +313,6 @@ AvalynxDataTable ist Open-Source-Software, die unter der [MIT-Lizenz](LICENSE) l
 
 ## Kontakt
 
-Wenn Sie Fragen, Funktionswünsche oder Probleme haben, eröffnen Sie bitte ein Issue in unserem [GitHub-Repository](https://github.com/avalynx/avalynx-datatable/issues) oder senden Sie einen Pull-Request.
+Wenn Sie Fragen, Funktionswünsche oder Probleme haben, eröffnen Sie bitte ein Issue in unserem [GitHub-Repository](https://github.com/avalynx/avalynx-datatable/issues) oder reichen Sie einen Pull-Request ein.
 
 Vielen Dank, dass Sie AvalynxDataTable für Ihr Projekt in Betracht ziehen!

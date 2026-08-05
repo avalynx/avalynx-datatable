@@ -1,0 +1,392 @@
+/**
+ * AvalynxTable
+ *
+ * A simple table system for web applications. Based on Bootstrap >=5.3 without any framework dependencies.
+ *
+ * @version 1.0.4
+ * @license MIT
+ * @author https://github.com/avalynx/avalynx-table/graphs/contributors
+ * @website https://github.com/avalynx/
+ * @repository https://github.com/avalynx/avalynx-table.git
+ * @bugs https://github.com/avalynx/avalynx-table/issues
+ */
+
+:root {
+    --avalynx-table-border-color: var(--bs-border-color);
+    --avalynx-table-cell-border-color: var(--bs-border-color);
+    --avalynx-table-cell-padding-left: 35%;
+    --avalynx-table-cell-padding-top: 0.5rem;
+    --avalynx-table-cell-padding-left-inner: 0.5rem;
+    --avalynx-table-cell-padding-right-inner: 1rem;
+    --avalynx-table-cell-before-width: 30%;
+    --avalynx-table-before-content: ": ";
+    --avalynx-table-before-align: left;
+    --avalynx-table-before-weight: bold;
+    --avalynx-table-before-style: none;
+    --avalynx-table-before-decoration: normal;
+}
+
+.avalynx-table-center {
+    text-align: center;
+}
+
+.avalynx-table th.avalynx-table-sorting,
+.avalynx-table td.avalynx-table-sorting,
+.avalynx-table th.avalynx-table-sorting-asc,
+.avalynx-table td.avalynx-table-sorting-asc,
+.avalynx-table th.avalynx-table-sorting-desc,
+.avalynx-table td.avalynx-table-sorting-desc,
+.avalynx-table th.avalynx-table-sorting-asc_disabled,
+.avalynx-table td.avalynx-table-sorting-asc_disabled,
+.avalynx-table th.avalynx-table-sorting-desc_disabled,
+.avalynx-table td.avalynx-table-sorting-desc_disabled {
+    cursor: pointer;
+    padding-right: 1.625rem;
+    position: relative;
+}
+
+.avalynx-table th.avalynx-table-sorting:before,
+.avalynx-table th.avalynx-table-sorting:after,
+.avalynx-table td.avalynx-table-sorting:before,
+.avalynx-table td.avalynx-table-sorting:after {
+    font-size: 0.8em;
+    line-height: 0.5625rem;
+    opacity: .125;
+    position: absolute;
+    right: 0.625rem;
+}
+
+.avalynx-table th.avalynx-table-sorting:before,
+.avalynx-table td.avalynx-table-sorting:before,
+.avalynx-table th.avalynx-table-sorting-asc:before,
+.avalynx-table td.avalynx-table-sorting-asc:before,
+.avalynx-table th.avalynx-table-sorting-desc:before,
+.avalynx-table td.avalynx-table-sorting-desc:before {
+    bottom: 50%;
+    content: "▲";
+}
+
+.avalynx-table th.avalynx-table-sorting:after,
+.avalynx-table td.avalynx-table-sorting:after,
+.avalynx-table th.avalynx-table-sorting-asc:after,
+.avalynx-table td.avalynx-table-sorting-asc:after,
+.avalynx-table th.avalynx-table-sorting-desc:after,
+.avalynx-table td.avalynx-table-sorting-desc:after {
+    top: 50%;
+    content: "▼";
+}
+
+.avalynx-table th.avalynx-table-sorting-asc:before,
+.avalynx-table th.avalynx-table-sorting-desc:after,
+.avalynx-table td.avalynx-table-sorting-asc:before,
+.avalynx-table td.avalynx-table-sorting-desc:after {
+    opacity: .7;
+}
+
+.avalynx-table-sort-controls {
+    display: none;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    margin-bottom: 0.75rem;
+}
+
+.avalynx-table-sort-buttons {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.avalynx-table-sort-button {
+    position: relative;
+    padding-right: 1.625rem;
+}
+
+.avalynx-table-sort-button::before,
+.avalynx-table-sort-button::after {
+    font-size: 0.8em;
+    line-height: 0.5625rem;
+    opacity: .125;
+    position: absolute;
+    right: 0.625rem;
+}
+
+.avalynx-table-sort-button::before {
+    bottom: 50%;
+    content: "▲";
+}
+
+.avalynx-table-sort-button::after {
+    top: 50%;
+    content: "▼";
+}
+
+.avalynx-table-sort-button.avalynx-table-sorting-asc::before,
+.avalynx-table-sort-button.avalynx-table-sorting-desc::after {
+    opacity: .7;
+}
+
+@media only screen and (max-width: 575.98px) {
+    .avalynx-table.table,
+    .avalynx-table thead,
+    .avalynx-table tbody,
+    .avalynx-table th,
+    .avalynx-table td,
+    .avalynx-table tr {
+        display: block;
+    }
+
+    .avalynx-table thead tr {
+        position: absolute;
+        top: -9999px;
+        left: -9999px;
+    }
+
+    .avalynx-table tr {
+        border: 1px solid var(--avalynx-table-border-color);
+    }
+
+    .avalynx-table td {
+        border: none;
+        border-bottom: 1px solid var(--avalynx-table-cell-border-color);
+        position: relative;
+        padding-left: var(--avalynx-table-cell-padding-left);
+        white-space: normal;
+        text-align: left;
+    }
+
+    .avalynx-table td:before {
+        content: attr(avalynx-td-title) var(--avalynx-table-before-content);
+        position: absolute;
+        top: var(--avalynx-table-cell-padding-top);
+        left: var(--avalynx-table-cell-padding-left-inner);
+        width: var(--avalynx-table-cell-before-width);
+        padding-right: var(--avalynx-table-cell-padding-right-inner);
+        white-space: nowrap;
+        text-align: var(--avalynx-table-before-align);
+        font-weight: var(--avalynx-table-before-weight);
+        font-style: var(--avalynx-table-before-style);
+        text-decoration: var(--avalynx-table-before-decoration);
+    }
+
+    .avalynx-table td.avalynx-table-center {
+        text-align: left;
+    }
+
+    .avalynx-table td.avalynx-table-center:before {
+        top: 50%;
+        transform: translateY(-50%);
+    }
+
+}
+@media only screen and (max-width: 767.98px) {
+    .avalynx-table-md.table,
+    .avalynx-table-md thead,
+    .avalynx-table-md tbody,
+    .avalynx-table-md th,
+    .avalynx-table-md td,
+    .avalynx-table-md tr {
+        display: block;
+    }
+
+    .avalynx-table-md thead tr {
+        position: absolute;
+        top: -9999px;
+        left: -9999px;
+    }
+
+    .avalynx-table-md tr {
+        border: 1px solid var(--avalynx-table-border-color);
+    }
+
+    .avalynx-table-md td {
+        border: none;
+        border-bottom: 1px solid var(--avalynx-table-cell-border-color);
+        position: relative;
+        padding-left: var(--avalynx-table-cell-padding-left);
+        white-space: normal;
+        text-align: left;
+    }
+
+    .avalynx-table-md td:before {
+        content: attr(avalynx-td-title) var(--avalynx-table-before-content);
+        position: absolute;
+        top: var(--avalynx-table-cell-padding-top);
+        left: var(--avalynx-table-cell-padding-left-inner);
+        width: var(--avalynx-table-cell-before-width);
+        padding-right: var(--avalynx-table-cell-padding-right-inner);
+        white-space: nowrap;
+        text-align: var(--avalynx-table-before-align);
+        font-weight: var(--avalynx-table-before-weight);
+        font-style: var(--avalynx-table-before-style);
+        text-decoration: var(--avalynx-table-before-decoration);
+    }
+
+    .avalynx-table-md td.avalynx-table-center {
+        text-align: left;
+    }
+
+    .avalynx-table-md td.avalynx-table-center:before {
+        top: 50%;
+        transform: translateY(-50%);
+    }
+
+}
+@media only screen and (max-width: 991.98px) {
+    .avalynx-table-lg.table,
+    .avalynx-table-lg thead,
+    .avalynx-table-lg tbody,
+    .avalynx-table-lg th,
+    .avalynx-table-lg td,
+    .avalynx-table-lg tr {
+        display: block;
+    }
+
+    .avalynx-table-lg thead tr {
+        position: absolute;
+        top: -9999px;
+        left: -9999px;
+    }
+
+    .avalynx-table-lg tr {
+        border: 1px solid var(--avalynx-table-border-color);
+    }
+
+    .avalynx-table-lg td {
+        border: none;
+        border-bottom: 1px solid var(--avalynx-table-cell-border-color);
+        position: relative;
+        padding-left: var(--avalynx-table-cell-padding-left);
+        white-space: normal;
+        text-align: left;
+    }
+
+    .avalynx-table-lg td:before {
+        content: attr(avalynx-td-title) var(--avalynx-table-before-content);
+        position: absolute;
+        top: var(--avalynx-table-cell-padding-top);
+        left: var(--avalynx-table-cell-padding-left-inner);
+        width: var(--avalynx-table-cell-before-width);
+        padding-right: var(--avalynx-table-cell-padding-right-inner);
+        white-space: nowrap;
+        text-align: var(--avalynx-table-before-align);
+        font-weight: var(--avalynx-table-before-weight);
+        font-style: var(--avalynx-table-before-style);
+        text-decoration: var(--avalynx-table-before-decoration);
+    }
+
+    .avalynx-table-lg td.avalynx-table-center {
+        text-align: left;
+    }
+
+    .avalynx-table-lg td.avalynx-table-center:before {
+        top: 50%;
+        transform: translateY(-50%);
+    }
+
+}
+@media only screen and (max-width: 1199.98px) {
+    .avalynx-table-xl.table,
+    .avalynx-table-xl thead,
+    .avalynx-table-xl tbody,
+    .avalynx-table-xl th,
+    .avalynx-table-xl td,
+    .avalynx-table-xl tr {
+        display: block;
+    }
+
+    .avalynx-table-xl thead tr {
+        position: absolute;
+        top: -9999px;
+        left: -9999px;
+    }
+
+    .avalynx-table-xl tr {
+        border: 1px solid var(--avalynx-table-border-color);
+    }
+
+    .avalynx-table-xl td {
+        border: none;
+        border-bottom: 1px solid var(--avalynx-table-cell-border-color);
+        position: relative;
+        padding-left: var(--avalynx-table-cell-padding-left);
+        white-space: normal;
+        text-align: left;
+    }
+
+    .avalynx-table-xl td:before {
+        content: attr(avalynx-td-title) var(--avalynx-table-before-content);
+        position: absolute;
+        top: var(--avalynx-table-cell-padding-top);
+        left: var(--avalynx-table-cell-padding-left-inner);
+        width: var(--avalynx-table-cell-before-width);
+        padding-right: var(--avalynx-table-cell-padding-right-inner);
+        white-space: nowrap;
+        text-align: var(--avalynx-table-before-align);
+        font-weight: var(--avalynx-table-before-weight);
+        font-style: var(--avalynx-table-before-style);
+        text-decoration: var(--avalynx-table-before-decoration);
+    }
+
+    .avalynx-table-xl td.avalynx-table-center {
+        text-align: left;
+    }
+
+    .avalynx-table-xl td.avalynx-table-center:before {
+        top: 50%;
+        transform: translateY(-50%);
+    }
+
+}
+@media only screen and (max-width: 1399.98px) {
+    .avalynx-table-xxl.table,
+    .avalynx-table-xxl thead,
+    .avalynx-table-xxl tbody,
+    .avalynx-table-xxl th,
+    .avalynx-table-xxl td,
+    .avalynx-table-xxl tr {
+        display: block;
+    }
+
+    .avalynx-table-xxl thead tr {
+        position: absolute;
+        top: -9999px;
+        left: -9999px;
+    }
+
+    .avalynx-table-xxl tr {
+        border: 1px solid var(--avalynx-table-border-color);
+    }
+
+    .avalynx-table-xxl td {
+        border: none;
+        border-bottom: 1px solid var(--avalynx-table-cell-border-color);
+        position: relative;
+        padding-left: var(--avalynx-table-cell-padding-left);
+        white-space: normal;
+        text-align: left;
+    }
+
+    .avalynx-table-xxl td:before {
+        content: attr(avalynx-td-title) var(--avalynx-table-before-content);
+        position: absolute;
+        top: var(--avalynx-table-cell-padding-top);
+        left: var(--avalynx-table-cell-padding-left-inner);
+        width: var(--avalynx-table-cell-before-width);
+        padding-right: var(--avalynx-table-cell-padding-right-inner);
+        white-space: nowrap;
+        text-align: var(--avalynx-table-before-align);
+        font-weight: var(--avalynx-table-before-weight);
+        font-style: var(--avalynx-table-before-style);
+        text-decoration: var(--avalynx-table-before-decoration);
+    }
+
+    .avalynx-table-xxl td.avalynx-table-center {
+        text-align: left;
+    }
+
+    .avalynx-table-xxl td.avalynx-table-center:before {
+        top: 50%;
+        transform: translateY(-50%);
+    }
+
+}
