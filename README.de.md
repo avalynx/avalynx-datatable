@@ -55,8 +55,8 @@ Ersetzen Sie `path/to/avalynx-datatable.js` und `path/to/avalynx-datatable.css` 
 AvalynxDataTable ist auch über [jsDelivr](https://www.jsdelivr.com/) verfügbar. Sie können es so in Ihr Projekt einbinden:
 
 ```html
-<link href="https://cdn.jsdelivr.net/npm/avalynx-datatable@1.0.5/dist/css/avalynx-datatable.min.css" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/avalynx-datatable@1.0.5/dist/js/avalynx-datatable.min.js"></script>
+<link href="https://cdn.jsdelivr.net/npm/avalynx-datatable@1.0.6/dist/css/avalynx-datatable.min.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/avalynx-datatable@1.0.6/dist/js/avalynx-datatable.min.js"></script>
 ```
 
 Stellen Sie sicher, dass Sie auch die JS/CSS-Dateien von Bootstrap in Ihr Projekt einbinden, damit AvalynxDataTable korrekt angezeigt wird.
@@ -281,8 +281,8 @@ AvalynxDataTable ermöglicht die folgenden Optionen zur Anpassung:
   - `paginationRange` (number): Die Anzahl der Seiten, die auf jeder Seite der aktuellen Seite in der Pagination angezeigt werden sollen (Standard: `2`).
   - `loader` (object): Eine Instanz von AvalynxLoader, die als Loader für die Tabelle verwendet werden soll (Standard: `null`).  
 - `language` (object): Ein Objekt, das die folgenden Schlüssel enthält:
-  - `showLabel` (string): Das Label für die Auswahl der Einträge pro Seite (Standard: `'Show'`).
-  - `entriesLabel` (string): Das Label neben der Auswahl der Einträge pro Seite, das angibt, was die Zahlen darstellen (Standard: `'entries'`).
+  - `showLabel` (string): Das Label für das Pro-Seite-Dropdown (Standard: `'Show'`).
+  - `entriesLabel` (string): Das Label neben dem Pro-Seite-Dropdown, das angibt, was die Zahlen darstellen (Standard: `'entries'`).
   - `searchLabel` (string): Das Label für das Sucheingabefeld (Standard: `'Search'`).
   - `previousLabel` (string): Das Label für den Zurück-Button der Pagination (Standard: `'Previous'`).
   - `nextLabel` (string): Das Label für den Weiter-Button der Pagination (Standard: `'Next'`).

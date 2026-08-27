@@ -57,8 +57,8 @@ Replace `path/to/avalynx-datatable.js` and `path/to/avalynx-datatable.css` with 
 AvalynxDataTable is also available via [jsDelivr](https://www.jsdelivr.com/). You can include it in your project like this:
 
 ```html
-<link href="https://cdn.jsdelivr.net/npm/avalynx-datatable@1.0.5/dist/css/avalynx-datatable.min.css" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/avalynx-datatable@1.0.5/dist/js/avalynx-datatable.min.js"></script>
+<link href="https://cdn.jsdelivr.net/npm/avalynx-datatable@1.0.6/dist/css/avalynx-datatable.min.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/avalynx-datatable@1.0.6/dist/js/avalynx-datatable.min.js"></script>
 ```
 
 Make sure to also include Bootstrap's JS/CSS in your project to ensure AvalynxDataTable displays correctly.
@@ -283,8 +283,8 @@ AvalynxDataTable allows the following options for customization:
   - `paginationRange` (number): The number of pages to show on either side of the current page in the pagination (default: `2`).
   - `loader` (object): An instance of AvalynxLoader to use as the loader for the table (default: `null`).  
 - `language` (object): An object containing the following keys:
-  - `showLabel` (string): The label for the per-page select (default: `'Show'`)
-  - `entriesLabel` (string): The label next to the per-page select indicating what the numbers represent (default: `'entries'`)
+  - `showLabel` (string): The label for the per-page dropdown (default: `'Show'`)
+  - `entriesLabel` (string): The label next to the per-page dropdown indicating what the numbers represent (default: `'entries'`)
   - `searchLabel` (string): The label for the search input (default: `'Search'`).
   - `previousLabel` (string): The label for the pagination's previous button (default: `'Previous'`).
   - `nextLabel` (string): The label for the pagination's next button (default: `'Next'`).

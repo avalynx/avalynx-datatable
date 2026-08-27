@@ -194,19 +194,22 @@ describe('AvalynxDataTable', () => {
     });
 
     describe('DOM Structure', () => {
-        test('should create top section with per-page select and search input', async () => {
+        test('should create top section with per-page dropdown and search input', async () => {
             new AvalynxDataTable('test-datatable', { apiUrl: 'http://test.com/api' });
 
             await new Promise(resolve => setTimeout(resolve, 10));
 
             const container = document.getElementById('test-datatable');
             const topSection = container.querySelector('.avalynx-datatable-top');
-            const perPageSelect = topSection.querySelector('.form-select');
+            const perPageToggle = topSection.querySelector('.dropdown-toggle');
+            const perPageMenu = topSection.querySelector('.dropdown-menu');
             const searchInput = topSection.querySelector('.form-control');
 
             expect(topSection).not.toBeNull();
-            expect(perPageSelect).not.toBeNull();
+            expect(perPageToggle).not.toBeNull();
+            expect(perPageMenu).not.toBeNull();
             expect(searchInput).not.toBeNull();
+            expect(perPageToggle.getAttribute('data-bs-toggle')).toBe('dropdown');
         });
 
         test('should apply default breakpoint class to top and bottom sections', async () => {
@@ -285,7 +288,7 @@ describe('AvalynxDataTable', () => {
     });
 
     describe('Per-Page Selection', () => {
-        test('should populate per-page select with listPerPage options', async () => {
+        test('should populate per-page dropdown with listPerPage options', async () => {
             new AvalynxDataTable('test-datatable', {
                 apiUrl: 'http://test.com/api',
                 listPerPage: [5, 10, 20]
@@ -293,16 +296,16 @@ describe('AvalynxDataTable', () => {
 
             await new Promise(resolve => setTimeout(resolve, 10));
 
-            const select = document.querySelector('.avalynx-datatable-top .form-select');
-            const options = select.querySelectorAll('option');
+            const menu = document.querySelector('.avalynx-datatable-top .dropdown-menu');
+            const items = menu.querySelectorAll('.dropdown-item');
 
-            expect(options.length).toBe(3);
-            expect(options[0].value).toBe('5');
-            expect(options[1].value).toBe('10');
-            expect(options[2].value).toBe('20');
+            expect(items.length).toBe(3);
+            expect(items[0].dataset.value).toBe('5');
+            expect(items[1].dataset.value).toBe('10');
+            expect(items[2].dataset.value).toBe('20');
         });
 
-        test('should select current perPage value', async () => {
+        test('should mark current perPage value as active', async () => {
             // Mock response with perPage 25
             const customResponse = {
                 ...mockFetchResponse,
@@ -316,7 +319,7 @@ describe('AvalynxDataTable', () => {
                 json: jest.fn().mockResolvedValue(customResponse)
             });
 
-            const dt = new AvalynxDataTable('test-datatable', {
+            new AvalynxDataTable('test-datatable', {
                 apiUrl: 'http://test.com/api',
                 perPage: 25,
                 listPerPage: [10, 25, 50, 100]
@@ -324,8 +327,10 @@ describe('AvalynxDataTable', () => {
 
             await new Promise(resolve => setTimeout(resolve, 200));
 
-            const select = document.querySelector('.avalynx-datatable-top .form-select');
-            expect(select.value).toBe('25');
+            const toggle = document.querySelector('.avalynx-datatable-top .dropdown-toggle');
+            const activeItem = document.querySelector('.avalynx-datatable-top .dropdown-item.active');
+            expect(toggle.textContent).toBe('25');
+            expect(activeItem.dataset.value).toBe('25');
         });
     });
 
@@ -921,14 +926,29 @@ describe('AvalynxDataTable', () => {
                 json: jest.fn().mockResolvedValue(updatedResponse)
             });
 
-            const select = document.querySelector('.avalynx-datatable-top .form-select');
-            select.value = '25';
-            select.dispatchEvent(new Event('change'));
+            const item = document.querySelector('.avalynx-datatable-top .dropdown-item[data-value="25"]');
+            item.dispatchEvent(new MouseEvent('click', { bubbles: true }));
 
             await new Promise(resolve => setTimeout(resolve, 200));
 
             expect(fetch).toHaveBeenCalled();
             expect(dt.options.perPage).toBe(25);
+        });
+
+        test('should ignore clicks inside the dropdown menu that are not on items', async () => {
+            const dt = new AvalynxDataTable('test-datatable', {
+                apiUrl: 'http://test.com/api'
+            });
+
+            await new Promise(resolve => setTimeout(resolve, 200));
+            fetch.mockClear();
+
+            const menu = document.querySelector('.avalynx-datatable-top .dropdown-menu');
+            menu.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+
+            await new Promise(resolve => setTimeout(resolve, 50));
+
+            expect(fetch).not.toHaveBeenCalled();
         });
 
         test('should trigger fetchData on pagination click', async () => {
@@ -1547,10 +1567,9 @@ describe('Additional Coverage', () => {
         dt.destroy();
 
         // Try to trigger per-page change
-        const select = document.querySelector('.avalynx-datatable-top-entries .form-select');
-        if (select) {
-            select.value = '25';
-            select.dispatchEvent(new Event('change', { bubbles: true }));
+        const item = document.querySelector('.avalynx-datatable-top-entries .dropdown-item[data-value="25"]');
+        if (item) {
+            item.dispatchEvent(new MouseEvent('click', { bubbles: true }));
         }
 
         // Try to trigger search input debounce

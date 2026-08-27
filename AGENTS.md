@@ -10,38 +10,46 @@ This project is part of the [Avalynx](https://github.com/avalynx) library family
 
 All development work, especially builds and tests, must be performed within the provided Docker environment.
 
+### Setup
+
+The development environment is managed with `./core.sh`. Create a local `.env.local` from `.env.local.example` (first time only):
+
+```bash
+cp .env.local.example .env.local
+```
+
 ### Start Docker
 
 ```bash
-docker-compose up -d
+./core.sh up
 ```
 
 ### Enter Container
 
 ```bash
-docker-compose exec -u application web bash
+./core.sh shell
 ```
 
 ## Build & Test
 
-Within the Docker container, use the following commands:
+All commands run inside the Docker container via `core.sh`:
 
 ### Install Dependencies
 
 ```bash
-npm install
+./core.sh npm install
 ```
 
 ### Build Project
 
 ```bash
-npm run build
+./core.sh npm run build
 ```
 
 ### Run Tests
 
 ```bash
-npm test
+./core.sh npm test
 ```
 
 ## Quality Standards
@@ -52,7 +60,7 @@ npm test
 *   No changes shall be accepted that lower the coverage below 100%.
 *   Coverage can be checked with the following command:
     ```bash
-    npm test -- --coverage
+    ./core.sh npm test -- --coverage
     ```
 
 ### Code Style

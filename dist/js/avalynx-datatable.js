@@ -3,7 +3,7 @@
  *
  * AvalynxDataTable is a simple, lightweight, and customizable data table for the web. Based on Bootstrap >=5.3 without any framework dependencies.
  *
- * @version 1.0.5
+ * @version 1.0.6
  * @license MIT
  * @author https://github.com/avalynx/avalynx-datatable/graphs/contributors
  * @website https://github.com/avalynx/
@@ -28,8 +28,8 @@
  * @param {object} options.loader - An instance of AvalynxLoader to use as the loader for the table (default: null).
  *
  * @param {object} language - An object containing the following keys:
- * @param {string} language.showLabel - The label for the per-page select (default: 'Show').
- * @param {string} language.entriesLabel - The label next to the per-page select indicating what the numbers represent (default: 'entries').
+ * @param {string} language.showLabel - The label for the per-page dropdown (default: 'Show').
+ * @param {string} language.entriesLabel - The label next to the per-page dropdown indicating what the numbers represent (default: 'entries').
  * @param {string} language.searchLabel - The label for the search input (default: 'Search').
  * @param {string} language.previousLabel - The label for the pagination's previous button (default: 'Previous').
  * @param {string} language.nextLabel - The label for the pagination's next button (default: 'Next').
@@ -202,7 +202,10 @@ class AvalynxDataTable {
                     <div class="d-flex align-self-center pb-2 avalynx-datatable-top-entries">
                         <label class="align-self-center"></label>
                         <div class="align-self-center px-2">
-                            <select class="form-select"></select>
+                            <div class="dropdown avalynx-datatable-dropdown">
+                                <button type="button" class="btn btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false"></button>
+                                <ul class="dropdown-menu"></ul>
+                            </div>
                         </div>
                         <label class="align-self-center"></label>
                     </div>
@@ -238,19 +241,24 @@ class AvalynxDataTable {
     }
 
     setupPerPageChangeEvent() {
-        const select = this.dt.querySelector(".avalynx-datatable-top-entries .form-select");
+        const menu = this.dt.querySelector(".avalynx-datatable-top-entries .dropdown-menu");
         this._boundHandlers.perPageChange = (event) => {
-            this.options.perPage = parseInt(event.target.value, 10);
+            const item = event.target.closest('.dropdown-item');
+            if (!item) return;
+            event.preventDefault();
+            this.options.perPage = parseInt(item.dataset.value, 10);
             this.fetchData();
         };
-        select.addEventListener('change', this._boundHandlers.perPageChange);
+        menu.addEventListener('click', this._boundHandlers.perPageChange);
     }
 
     populatePerPageOptions() {
-        const select = this.dt.querySelector(".avalynx-datatable-top-entries .form-select");
-        select.innerHTML = this.options.listPerPage
-            .map(num => `<option value="${num}"${num === this.options.perPage ? ' selected' : ''}>${num}</option>`)
+        const menu = this.dt.querySelector(".avalynx-datatable-top-entries .dropdown-menu");
+        menu.innerHTML = this.options.listPerPage
+            .map(num => `<li><a class="dropdown-item${num === this.options.perPage ? ' active' : ''}" href="#" data-value="${num}">${num}</a></li>`)
             .join('');
+        const toggle = this.dt.querySelector(".avalynx-datatable-top-entries .dropdown-toggle");
+        toggle.textContent = this.options.perPage;
     }
 
     setupSearchInputChangeEvent() {
@@ -472,9 +480,9 @@ class AvalynxDataTable {
             thead.removeEventListener('click', this._boundHandlers.sort);
         }
 
-        const select = this.dt.querySelector(".avalynx-datatable-top-entries .form-select");
-        if (select && this._boundHandlers.perPageChange) {
-            select.removeEventListener('change', this._boundHandlers.perPageChange);
+        const menu = this.dt.querySelector(".avalynx-datatable-top-entries .dropdown-menu");
+        if (menu && this._boundHandlers.perPageChange) {
+            menu.removeEventListener('click', this._boundHandlers.perPageChange);
         }
 
         const searchInput = this.dt.querySelector(".avalynx-datatable-top-search .form-control");
