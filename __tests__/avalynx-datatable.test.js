@@ -585,6 +585,65 @@ describe('AvalynxDataTable', () => {
             expect(cell.innerHTML).toContain('<strong>');
         });
 
+        test('should render non-breaking space for empty cell values', async () => {
+            mockFetchResponse.data[0].data.name = '';
+            mockFetchResponse.data[0].data.email = null;
+            mockFetchResponse.data[1].data.id = undefined;
+
+            fetch.mockResolvedValue({
+                json: jest.fn().mockResolvedValue(mockFetchResponse)
+            });
+
+            const dt = new AvalynxDataTable('test-datatable', {
+                apiUrl: 'http://test.com/api'
+            });
+
+            await new Promise(resolve => setTimeout(resolve, 200));
+
+            const firstRow = document.querySelector('.avalynx-datatable-table tbody tr:first-child');
+            expect(firstRow.querySelector('td:nth-child(2)').innerHTML).toBe('&nbsp;');
+            expect(firstRow.querySelector('td:nth-child(3)').innerHTML).toBe('&nbsp;');
+            expect(firstRow.querySelector('td:nth-child(1)').textContent).toBe('1');
+
+            const secondRow = document.querySelector('.avalynx-datatable-table tbody tr:nth-child(2)');
+            expect(secondRow.querySelector('td:nth-child(1)').innerHTML).toBe('&nbsp;');
+        });
+
+        test('should render non-breaking space for empty raw cell values', async () => {
+            mockFetchResponse.head.columns[1].raw = true;
+            mockFetchResponse.data[0].data.name = '';
+
+            fetch.mockResolvedValue({
+                json: jest.fn().mockResolvedValue(mockFetchResponse)
+            });
+
+            const dt = new AvalynxDataTable('test-datatable', {
+                apiUrl: 'http://test.com/api'
+            });
+
+            await new Promise(resolve => setTimeout(resolve, 200));
+
+            const cell = document.querySelector('.avalynx-datatable-table tbody tr:first-child td:nth-child(2)');
+            expect(cell.innerHTML).toBe('&nbsp;');
+        });
+
+        test('should render zero as value and not as empty cell', async () => {
+            mockFetchResponse.data[0].data.name = 0;
+
+            fetch.mockResolvedValue({
+                json: jest.fn().mockResolvedValue(mockFetchResponse)
+            });
+
+            const dt = new AvalynxDataTable('test-datatable', {
+                apiUrl: 'http://test.com/api'
+            });
+
+            await new Promise(resolve => setTimeout(resolve, 200));
+
+            const cell = document.querySelector('.avalynx-datatable-table tbody tr:first-child td:nth-child(2)');
+            expect(cell.textContent).toBe('0');
+        });
+
         test('should apply custom classes to columns', async () => {
             mockFetchResponse.head.columns[0].class = 'custom-column-class';
 
@@ -617,6 +676,110 @@ describe('AvalynxDataTable', () => {
 
             const row = document.querySelector('.avalynx-datatable-table tbody tr:first-child');
             expect(row.classList.contains('custom-row-class')).toBe(true);
+        });
+    });
+
+    describe('Fixed Columns', () => {
+        test('should apply fixed start class to th and td', async () => {
+            mockFetchResponse.head.columns[0].fixed = 'start';
+
+            fetch.mockResolvedValue({
+                json: jest.fn().mockResolvedValue(mockFetchResponse)
+            });
+
+            const dt = new AvalynxDataTable('test-datatable', {
+                apiUrl: 'http://test.com/api'
+            });
+
+            await new Promise(resolve => setTimeout(resolve, 200));
+
+            const header = document.querySelector('.avalynx-datatable-table thead th:first-child');
+            expect(header.classList.contains('avalynx-datatable-fixed-start')).toBe(true);
+
+            const cell = document.querySelector('.avalynx-datatable-table tbody tr:first-child td:first-child');
+            expect(cell.classList.contains('avalynx-datatable-fixed-start')).toBe(true);
+        });
+
+        test('should apply fixed end class to th and td', async () => {
+            mockFetchResponse.head.columns[2].fixed = 'end';
+
+            fetch.mockResolvedValue({
+                json: jest.fn().mockResolvedValue(mockFetchResponse)
+            });
+
+            const dt = new AvalynxDataTable('test-datatable', {
+                apiUrl: 'http://test.com/api'
+            });
+
+            await new Promise(resolve => setTimeout(resolve, 200));
+
+            const header = document.querySelector('.avalynx-datatable-table thead th:last-child');
+            expect(header.classList.contains('avalynx-datatable-fixed-end')).toBe(true);
+
+            const cell = document.querySelector('.avalynx-datatable-table tbody tr:first-child td:last-child');
+            expect(cell.classList.contains('avalynx-datatable-fixed-end')).toBe(true);
+        });
+
+        test('should ignore invalid fixed values', async () => {
+            mockFetchResponse.head.columns[0].fixed = 'center';
+
+            fetch.mockResolvedValue({
+                json: jest.fn().mockResolvedValue(mockFetchResponse)
+            });
+
+            const dt = new AvalynxDataTable('test-datatable', {
+                apiUrl: 'http://test.com/api'
+            });
+
+            await new Promise(resolve => setTimeout(resolve, 200));
+
+            const header = document.querySelector('.avalynx-datatable-table thead th:first-child');
+            expect(header.classList.contains('avalynx-datatable-fixed-center')).toBe(false);
+            expect(header.className).not.toContain('avalynx-datatable-fixed');
+        });
+
+        test('should not apply fixed class when fixed is not set', async () => {
+            fetch.mockResolvedValue({
+                json: jest.fn().mockResolvedValue(mockFetchResponse)
+            });
+
+            const dt = new AvalynxDataTable('test-datatable', {
+                apiUrl: 'http://test.com/api'
+            });
+
+            await new Promise(resolve => setTimeout(resolve, 200));
+
+            const header = document.querySelector('.avalynx-datatable-table thead th:first-child');
+            expect(header.classList.contains('avalynx-datatable-fixed-start')).toBe(false);
+            expect(header.classList.contains('avalynx-datatable-fixed-end')).toBe(false);
+        });
+
+        test('should get fixed class via getFixedClass', () => {
+            const dt = new AvalynxDataTable('test-datatable', {
+                apiUrl: 'http://test.com/api'
+            });
+
+            expect(dt.getFixedClass({fixed: 'start'})).toBe('avalynx-datatable-fixed-start');
+            expect(dt.getFixedClass({fixed: 'end'})).toBe('avalynx-datatable-fixed-end');
+            expect(dt.getFixedClass({fixed: 'center'})).toBeNull();
+            expect(dt.getFixedClass({})).toBeNull();
+        });
+
+        test('should wrap table in responsive container', async () => {
+            fetch.mockResolvedValue({
+                json: jest.fn().mockResolvedValue(mockFetchResponse)
+            });
+
+            const dt = new AvalynxDataTable('test-datatable', {
+                apiUrl: 'http://test.com/api'
+            });
+
+            await new Promise(resolve => setTimeout(resolve, 200));
+
+            const container = document.getElementById('test-datatable');
+            const responsive = container.querySelector(':scope > .avalynx-datatable-responsive');
+            expect(responsive).not.toBeNull();
+            expect(responsive.querySelector('table.avalynx-datatable-table')).not.toBeNull();
         });
     });
 

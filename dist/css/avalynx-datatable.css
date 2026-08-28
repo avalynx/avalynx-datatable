@@ -11,6 +11,7 @@
  * @bugs https://github.com/avalynx/avalynx-datatable/issues
  */
 
+
 .avalynx-datatable-table th.avalynx-datatable-sorting,
 .avalynx-datatable-table td.avalynx-datatable-sorting,
 .avalynx-datatable-table th.avalynx-datatable-sorting-asc,
@@ -67,6 +68,33 @@
 .avalynx-datatable-table th.avalynx-datatable-options,
 .avalynx-datatable-table td.avalynx-datatable-options {
     text-align: center;
-    width: 1%;
     white-space: nowrap;
+}
+.avalynx-datatable-responsive {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    margin-bottom: 1rem;
+}
+
+.avalynx-datatable-responsive > .avalynx-datatable-table {
+    margin: 0;
+    box-shadow: inset 0 -1px 0 var(--bs-border-color, #dee2e6);
+}
+
+.avalynx-datatable-table th.avalynx-datatable-fixed-start,
+.avalynx-datatable-table td.avalynx-datatable-fixed-start {
+    position: sticky;
+    inset-inline-start: 0;
+    z-index: 1;
+    background-color: var(--bs-table-bg, var(--bs-body-bg, #fff));
+    box-shadow: inset 1px 0 0 var(--bs-border-color, #dee2e6), inset -1px 0 0 var(--bs-border-color, #dee2e6), inset 0 0 0 9999px var(--bs-table-bg-state, var(--bs-table-bg-type, var(--bs-table-accent-bg)));
+}
+
+.avalynx-datatable-table th.avalynx-datatable-fixed-end,
+.avalynx-datatable-table td.avalynx-datatable-fixed-end {
+    position: sticky;
+    inset-inline-end: 0;
+    z-index: 1;
+    background-color: var(--bs-table-bg, var(--bs-body-bg, #fff));
+    box-shadow: inset 1px 0 0 var(--bs-border-color, #dee2e6), inset -1px 0 0 var(--bs-border-color, #dee2e6), inset 0 0 0 9999px var(--bs-table-bg-state, var(--bs-table-bg-type, var(--bs-table-accent-bg)));
 }

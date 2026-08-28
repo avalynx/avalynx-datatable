@@ -108,12 +108,16 @@ class AvalynxDataTable {
         table.className = `${this.options.className} avalynx-datatable-table`;
         table.id = `${this.id}-table`;
 
+        const responsive = document.createElement("div");
+        responsive.className = "avalynx-datatable-responsive";
+        responsive.appendChild(tableTemplate);
+
         const topEntries = topTemplate.querySelector(".avalynx-datatable-top-entries");
         topEntries.querySelector("label:first-child").textContent = this.language.showLabel;
         topEntries.querySelector("label:last-child").textContent = this.language.entriesLabel;
         topTemplate.querySelector(".avalynx-datatable-top-search label").textContent = this.language.searchLabel;
 
-        this.dt.append(topTemplate, tableTemplate, bottomTemplate);
+        this.dt.append(topTemplate, responsive, bottomTemplate);
 
         this.setupOverlayAndLoader();
         this.setupPerPageChangeEvent();
@@ -294,8 +298,11 @@ class AvalynxDataTable {
             th.textContent = column.name;
             th.dataset.avalynxDatatableColumnId = column.id;
 
+            const fixedClass = this.getFixedClass(column);
+
             if (column.hidden) th.classList.add("d-none");
             if (column.class) th.classList.add(column.class);
+            if (fixedClass) th.classList.add(fixedClass);
             if (column.sortable) {
                 th.classList.add("avalynx-datatable-sorting");
                 th.dataset.avalynxDatatableSortable = "true";
@@ -314,14 +321,20 @@ class AvalynxDataTable {
             for (const column of this.result.head.columns) {
                 const td = document.createElement("td");
 
+                const fixedClass = this.getFixedClass(column);
+
                 if (column.hidden) td.classList.add("d-none");
                 if (column.class) td.classList.add(column.class);
+                if (fixedClass) td.classList.add(fixedClass);
                 if (rowData.data_class?.[column.id]) td.classList.add(rowData.data_class[column.id]);
 
-                if (column.raw) {
-                    td.innerHTML = rowData.data[column.id];
+                const cellValue = rowData.data[column.id];
+                if (null === cellValue || undefined === cellValue || '' === cellValue) {
+                    td.innerHTML = '&nbsp;';
+                } else if (column.raw) {
+                    td.innerHTML = cellValue;
                 } else {
-                    td.textContent = rowData.data[column.id];
+                    td.textContent = cellValue;
                 }
 
                 tr.appendChild(td);
@@ -335,6 +348,13 @@ class AvalynxDataTable {
         this.populateShowEntries();
         this.populatePagination();
         this.initAvalynxTable();
+    }
+
+    getFixedClass(column) {
+        if (column.fixed !== 'start' && column.fixed !== 'end') {
+            return null;
+        }
+        return `avalynx-datatable-fixed-${column.fixed}`;
     }
 
     initAvalynxTable() {
