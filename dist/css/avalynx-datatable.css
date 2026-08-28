@@ -76,9 +76,43 @@
     margin-bottom: 1rem;
 }
 
+/*
+ * The separate border model makes borders belong to the cells, so they stick
+ * with position: sticky cells (browsers drop collapsed borders on sticky
+ * cells). One-sided borders on the cells avoid doubled lines.
+ */
 .avalynx-datatable-responsive > .avalynx-datatable-table {
+    border-collapse: separate;
+    border-spacing: 0;
     margin: 0;
-    box-shadow: inset 0 -1px 0 var(--bs-border-color, #dee2e6);
+}
+
+.avalynx-datatable-responsive > .avalynx-datatable-table > :not(caption) > * {
+    border-width: 0;
+}
+
+.avalynx-datatable-responsive > .avalynx-datatable-table > :not(caption) > * > * {
+    border-bottom-width: var(--bs-border-width, 1px);
+    border-inline-end-width: 0;
+}
+
+.avalynx-datatable-responsive > .avalynx-datatable-table.table-bordered > :not(caption) > * > *:last-child {
+    border-inline-end-width: var(--bs-border-width, 1px);
+}
+
+.avalynx-datatable-responsive > .avalynx-datatable-table.table-bordered > thead:first-child > tr:first-child > *,
+.avalynx-datatable-responsive > .avalynx-datatable-table.table-bordered > tbody:first-child > tr:first-child > *,
+.avalynx-datatable-responsive > .avalynx-datatable-table.table-bordered > tfoot:first-child > tr:first-child > * {
+    border-top-width: var(--bs-border-width, 1px);
+}
+
+.avalynx-datatable-responsive > .avalynx-datatable-table > :not(caption) > * > *.avalynx-datatable-fixed-start {
+    border-inline-end-width: var(--bs-border-width, 1px);
+}
+
+.avalynx-datatable-responsive > .avalynx-datatable-table > :not(caption) > * > th.avalynx-datatable-fixed-start + th,
+.avalynx-datatable-responsive > .avalynx-datatable-table > :not(caption) > * > td.avalynx-datatable-fixed-start + td {
+    border-inline-start-width: 0;
 }
 
 .avalynx-datatable-table th.avalynx-datatable-fixed-start,
@@ -87,7 +121,7 @@
     inset-inline-start: 0;
     z-index: 1;
     background-color: var(--bs-table-bg, var(--bs-body-bg, #fff));
-    box-shadow: inset 1px 0 0 var(--bs-border-color, #dee2e6), inset -1px 0 0 var(--bs-border-color, #dee2e6), inset 0 0 0 9999px var(--bs-table-bg-state, var(--bs-table-bg-type, var(--bs-table-accent-bg)));
+    box-shadow: inset 0 0 0 9999px var(--bs-table-bg-state, var(--bs-table-bg-type, var(--bs-table-accent-bg)));
 }
 
 .avalynx-datatable-table th.avalynx-datatable-fixed-end,
@@ -96,5 +130,12 @@
     inset-inline-end: 0;
     z-index: 1;
     background-color: var(--bs-table-bg, var(--bs-body-bg, #fff));
-    box-shadow: inset 1px 0 0 var(--bs-border-color, #dee2e6), inset -1px 0 0 var(--bs-border-color, #dee2e6), inset 0 0 0 9999px var(--bs-table-bg-state, var(--bs-table-bg-type, var(--bs-table-accent-bg)));
+    box-shadow: inset 0 0 0 9999px var(--bs-table-bg-state, var(--bs-table-bg-type, var(--bs-table-accent-bg)));
+}
+
+.avalynx-datatable-table:not(.table-bordered) th.avalynx-datatable-fixed-start,
+.avalynx-datatable-table:not(.table-bordered) td.avalynx-datatable-fixed-start,
+.avalynx-datatable-table:not(.table-bordered) th.avalynx-datatable-fixed-end,
+.avalynx-datatable-table:not(.table-bordered) td.avalynx-datatable-fixed-end {
+    border-inline: var(--bs-border-width, 1px) solid var(--bs-border-color, #dee2e6);
 }
