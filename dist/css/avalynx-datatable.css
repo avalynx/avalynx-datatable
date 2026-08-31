@@ -3,14 +3,13 @@
  *
  * A simple, lightweight, and customizable data table for the web. Based on Bootstrap >=5.3 without any framework dependencies.
  *
- * @version 1.0.6
+ * @version 1.0.7
  * @license MIT
  * @author https://github.com/avalynx/avalynx-datatable/graphs/contributors
  * @website https://github.com/avalynx/
  * @repository https://github.com/avalynx/avalynx-datatable.git
  * @bugs https://github.com/avalynx/avalynx-datatable/issues
  */
-
 
 .avalynx-datatable-table th.avalynx-datatable-sorting,
 .avalynx-datatable-table td.avalynx-datatable-sorting,
@@ -76,11 +75,6 @@
     margin-bottom: 1rem;
 }
 
-/*
- * The separate border model makes borders belong to the cells, so they stick
- * with position: sticky cells (browsers drop collapsed borders on sticky
- * cells). One-sided borders on the cells avoid doubled lines.
- */
 .avalynx-datatable-responsive > .avalynx-datatable-table {
     border-collapse: separate;
     border-spacing: 0;

@@ -3,7 +3,7 @@
  *
  * AvalynxDataTable is a simple, lightweight, and customizable data table for the web. Based on Bootstrap >=5.3 without any framework dependencies.
  *
- * @version 1.0.6
+ * @version 1.0.7
  * @license MIT
  * @author https://github.com/avalynx/avalynx-datatable/graphs/contributors
  * @website https://github.com/avalynx/
@@ -12,16 +12,16 @@
  *
  * @param {string} id - The ID of the element to attach the table to.
  * @param {object} options - An object containing the following keys:
- * @param {string} options.apiUrl - The URL to fetch the data from (default: null).
+ * @param {string} options.apiUrl - The URL to fetch the data from (default: '').
  * @param {string} options.apiMethod - The HTTP method to use when fetching data from the API (default: 'POST').
  * @param {object} options.apiParams - Additional parameters to send with the API request (default: {}).
- * @param {object} options.sorting - The initial sorting configuration for the table. Format is an array of objects specifying column and direction, e.g., [{"column": "name", "dir": "asc"}] (default: []).
+ * @param {object} options.sorting - The initial sorting configuration for the table. Format is an object with column ids as keys and sort directions as values, e.g., {"name": "asc"} (default: []).
  * @param {number} options.currentPage - The initial page number to display (default: 1).
  * @param {string} options.search - The initial search string to filter the table data (default: '').
  * @param {number} options.searchWait - The debounce time in milliseconds for search input to wait after the last keystroke before performing the search (default: 800).
  * @param {array} options.listPerPage - The list of options for the per-page dropdown (default: [10, 25, 50, 100]).
  * @param {number} options.perPage - The initial number of items per page (default: 10).
- * @param {string} options.className - The CSS classes to apply to the table (default: 'table table-striped table-bordered table-responsive').
+ * @param {string} options.className - The CSS classes to apply to the table (default: 'table table-striped table-bordered table-responsive align-middle').
  * @param {string} options.breakpoint - Bootstrap breakpoint used for top/bottom row layout (default: 'md').
  * @param {boolean} options.paginationPrevNext - Whether to show the previous and next buttons in the pagination (default: true).
  * @param {number} options.paginationRange - The number of pages to show on either side of the current page in the pagination (default: 2).
@@ -34,7 +34,7 @@
  * @param {string} language.previousLabel - The label for the pagination's previous button (default: 'Previous').
  * @param {string} language.nextLabel - The label for the pagination's next button (default: 'Next').
  * @param {function} language.showingEntries - A function to format the text showing the range of visible entries out of the total (default: (start, end, total) => 'Showing ${start} to ${end} of ${total} entries').
- * @param {function} language.showingFilteredEntries - A function to format the text showing the range of visible entries out of the total when filtered (default: (start, end, filtered, total) => 'Showing ${start} to ${end} of ${filtered} entries (filtered from ${total} entries)').
+ * @param {function} language.showingFilteredEntries - A function to format the text showing the range of visible entries out of the total when filtered (default: (start, end, filtered, total) => 'Showing ${start} to ${end} of ${filtered} entries (filtered from ${total} total entries)').
  *
  */
 

@@ -29,6 +29,7 @@ Here's a simple example of how to use AvalynxDataTable in your project:
 * [DataTable](https://avalynx-datatable.jbs-newmedia.de/examples/datatable.html)
 * [DataTable with slow response](https://avalynx-datatable.jbs-newmedia.de/examples/datatable-slow-response.html)
 * [DataTable multiple instances](https://avalynx-datatable.jbs-newmedia.de/examples/datatable-multiple-instances.html)
+* [DataTable scrolling with fixed columns](https://avalynx-datatable.jbs-newmedia.de/examples/datatable-scrolling.html)
 * [DataTable with AvalynxLoader & AvalynxTable Integration](https://avalynx-datatable.jbs-newmedia.de/examples/datatable-loader-table-integration.html)
 
 ## Installation
@@ -57,8 +58,8 @@ Replace `path/to/avalynx-datatable.js` and `path/to/avalynx-datatable.css` with 
 AvalynxDataTable is also available via [jsDelivr](https://www.jsdelivr.com/). You can include it in your project like this:
 
 ```html
-<link href="https://cdn.jsdelivr.net/npm/avalynx-datatable@1.0.6/dist/css/avalynx-datatable.min.css" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/avalynx-datatable@1.0.6/dist/js/avalynx-datatable.min.js"></script>
+<link href="https://cdn.jsdelivr.net/npm/avalynx-datatable@1.0.7/dist/css/avalynx-datatable.min.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/avalynx-datatable@1.0.7/dist/js/avalynx-datatable.min.js"></script>
 ```
 
 Make sure to also include Bootstrap's JS/CSS in your project to ensure AvalynxDataTable displays correctly.
@@ -182,11 +183,11 @@ AvalynxDataTable expects data in a specific JSON format to render the table corr
 {
     "head": {
         "columns": [
-            {"name": "Name", "sortable": true, "id": "name"},
+            {"name": "Name", "sortable": true, "id": "name", "fixed": "start"},
             {"name": "ID", "sortable": true, "id": "id", "hidden": true},
             {"name": "Age", "id": "age"},
             {"name": "City", "sortable": true, "id": "city"},
-            {"name": "Options", "raw": true, "id": "options", "class": "avalynx-datatable-options"}
+            {"name": "Options", "raw": true, "id": "options", "class": "avalynx-datatable-options", "fixed": "end"}
         ]
     },
     "data": [
@@ -242,6 +243,7 @@ AvalynxDataTable expects data in a specific JSON format to render the table corr
     - **hidden**: (optional) Indicates if the column is hidden by default.
     - **raw**: (optional) Specifies that the content of the column is raw HTML.
     - **class**: (optional) CSS class for the column, which can be used for styling.
+    - **fixed**: (optional) Pins the column during horizontal scrolling. Possible values are `'start'` (fixed at the left edge) or `'end'` (fixed at the right edge).
 
 - **data**: Contains the actual data that is displayed in the table. Each entry (row) contains the following:
     - **data**: An object with the actual row values, such as `id`, `name`, `age`, `city`, and an `options` field that contains HTML for action buttons.
@@ -268,16 +270,16 @@ AvalynxDataTable allows the following options for customization:
 
 - `id` (string): The ID of the element to attach the table to.
 - `options` (object): An object containing the following keys:
-  - `apiUrl` (string): URL to fetch the data from (default: `null`).
+  - `apiUrl` (string): URL to fetch the data from (default: `''`).
   - `apiMethod` (string): The HTTP method to use when fetching data from the API (default: `'POST'`).
   - `apiParams` (object): Additional parameters to send with the API request (default: `{}`).
-  - `sorting` (object): The initial sorting configuration for the table. Format is an array of objects specifying column and direction, e.g., `[{"column": "name", "dir": "asc"}]` (default: `[]`).
+  - `sorting` (object): The initial sorting configuration for the table. Format is an object with column ids as keys and sort directions as values, e.g., `{"name": "asc"}` (default: `[]`).
   - `currentPage` (number): The initial page number to display (default: `1`).
   - `search` (string): The initial search string to filter the table data (default: `''`).
   - `searchWait` (number): The debounce time in milliseconds for search input to wait after the last keystroke before performing the search (default: `800`).
   - `listPerPage` (array): The list of options for the per-page dropdown (default: `[10, 25, 50, 100]`).
   - `perPage` (number): The initial number of items per page (default: `10`).
-  - `className` (string): The CSS classes to apply to the table (default: `'table table-striped table-bordered table-responsive'`).
+  - `className` (string): The CSS classes to apply to the table (default: `'table table-striped table-bordered table-responsive align-middle'`).
   - `breakpoint` (string): Bootstrap breakpoint used for top/bottom row layout (`flex-{breakpoint}-row`, default: `'md'`).
   - `paginationPrevNext` (boolean): Whether to show the previous and next buttons in the pagination (default: `true`).
   - `paginationRange` (number): The number of pages to show on either side of the current page in the pagination (default: `2`).
@@ -289,7 +291,7 @@ AvalynxDataTable allows the following options for customization:
   - `previousLabel` (string): The label for the pagination's previous button (default: `'Previous'`).
   - `nextLabel` (string): The label for the pagination's next button (default: `'Next'`).
   - `showingEntries` (function): A function to format the text showing the range of visible entries out of the total (default: `(start, end, total) => 'Showing ${start} to ${end} of ${total} entries'`).
-  - `showingFilteredEntries` (function): A function to format the text showing the range of visible entries out of the total when filtered (default: `(start, end, filtered, total) => 'Showing ${start} to ${end} of ${filtered} entries (filtered from ${total} entries)'`).
+  - `showingFilteredEntries` (function): A function to format the text showing the range of visible entries out of the total when filtered (default: `(start, end, filtered, total) => 'Showing ${start} to ${end} of ${filtered} entries (filtered from ${total} total entries)'`).
 
 ## Planned features
 

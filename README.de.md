@@ -27,6 +27,7 @@ Hier ist ein einfaches Beispiel für die Verwendung von AvalynxDataTable in Ihre
 * [DataTable](https://avalynx-datatable.jbs-newmedia.de/examples/datatable.html)
 * [DataTable mit langsamer Antwort](https://avalynx-datatable.jbs-newmedia.de/examples/datatable-slow-response.html)
 * [DataTable mit mehreren Instanzen](https://avalynx-datatable.jbs-newmedia.de/examples/datatable-multiple-instances.html)
+* [DataTable mit Scrollen und fixierten Spalten](https://avalynx-datatable.jbs-newmedia.de/examples/datatable-scrolling.html)
 * [DataTable mit AvalynxLoader & AvalynxTable Integration](https://avalynx-datatable.jbs-newmedia.de/examples/datatable-loader-table-integration.html)
 
 ## Installation
@@ -55,8 +56,8 @@ Ersetzen Sie `path/to/avalynx-datatable.js` und `path/to/avalynx-datatable.css` 
 AvalynxDataTable ist auch über [jsDelivr](https://www.jsdelivr.com/) verfügbar. Sie können es so in Ihr Projekt einbinden:
 
 ```html
-<link href="https://cdn.jsdelivr.net/npm/avalynx-datatable@1.0.6/dist/css/avalynx-datatable.min.css" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/avalynx-datatable@1.0.6/dist/js/avalynx-datatable.min.js"></script>
+<link href="https://cdn.jsdelivr.net/npm/avalynx-datatable@1.0.7/dist/css/avalynx-datatable.min.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/avalynx-datatable@1.0.7/dist/js/avalynx-datatable.min.js"></script>
 ```
 
 Stellen Sie sicher, dass Sie auch die JS/CSS-Dateien von Bootstrap in Ihr Projekt einbinden, damit AvalynxDataTable korrekt angezeigt wird.
@@ -180,11 +181,11 @@ AvalynxDataTable erwartet Daten in einem spezifischen JSON-Format, um die Tabell
 {
     "head": {
         "columns": [
-            {"name": "Name", "sortable": true, "id": "name"},
+            {"name": "Name", "sortable": true, "id": "name", "fixed": "start"},
             {"name": "ID", "sortable": true, "id": "id", "hidden": true},
             {"name": "Alter", "id": "age"},
             {"name": "Stadt", "sortable": true, "id": "city"},
-            {"name": "Optionen", "raw": true, "id": "options", "class": "avalynx-datatable-options"}
+            {"name": "Optionen", "raw": true, "id": "options", "class": "avalynx-datatable-options", "fixed": "end"}
         ]
     },
     "data": [
@@ -240,6 +241,7 @@ AvalynxDataTable erwartet Daten in einem spezifischen JSON-Format, um die Tabell
     - **hidden**: (optional) Gibt an, ob die Spalte standardmäßig ausgeblendet ist.
     - **raw**: (optional) Gibt an, ob der Inhalt der Spalte rohes HTML ist.
     - **class**: (optional) CSS-Klasse für die Spalte, die für das Styling verwendet werden kann.
+    - **fixed**: (optional) Fixiert die Spalte beim horizontalen Scrollen. Mögliche Werte sind `'start'` (am linken Rand fixiert) oder `'end'` (am rechten Rand fixiert).
 
 - **data**: Enthält die tatsächlichen Daten, die in der Tabelle angezeigt werden. Jeder Eintrag (Zeile) enthält Folgendes:
     - **data**: Ein Objekt mit den tatsächlichen Zeilenwerten, wie `id`, `name`, `age`, `city` und ein `options`-Feld, das HTML für Aktionsschaltflächen enthält.
@@ -266,16 +268,16 @@ AvalynxDataTable ermöglicht die folgenden Optionen zur Anpassung:
 
 - `id` (string): Die ID des Elements, an das die Tabelle angehängt werden soll.
 - `options` (object): Ein Objekt, das die folgenden Schlüssel enthält:
-  - `apiUrl` (string): URL zum Abrufen der Daten (Standard: `null`).
+  - `apiUrl` (string): URL zum Abrufen der Daten (Standard: `''`).
   - `apiMethod` (string): Die HTTP-Methode, die beim Abrufen von Daten von der API verwendet werden soll (Standard: `'POST'`).
   - `apiParams` (object): Zusätzliche Parameter, die mit der API-Anfrage gesendet werden sollen (Standard: `{}`).
-  - `sorting` (object): Die anfängliche Sortierkonfiguration für die Tabelle. Das Format ist ein Array von Objekten, die Spalte und Richtung angeben, z. B. `[{"column": "name", "dir": "asc"}]` (Standard: `[]`).
+  - `sorting` (object): Die anfängliche Sortierkonfiguration für die Tabelle. Das Format ist ein Objekt mit Spalten-IDs als Schlüsseln und Sortierrichtungen als Werten, z. B. `{"name": "asc"}` (Standard: `[]`).
   - `currentPage` (number): Die anfängliche Seitennummer, die angezeigt werden soll (Standard: `1`).
   - `search` (string): Der anfängliche Suchstring zum Filtern der Tabellendaten (Standard: `''`).
   - `searchWait` (number): Die Debounce-Zeit in Millisekunden, die nach dem letzten Tastendruck gewartet wird, bevor die Suche ausgeführt wird (Standard: `800`).
   - `listPerPage` (array): Die Liste der Optionen für das Pro-Seite-Dropdown (Standard: `[10, 25, 50, 100]`).
   - `perPage` (number): Die anfängliche Anzahl der Elemente pro Seite (Standard: `10`).
-  - `className` (string): Die CSS-Klassen, die auf die Tabelle angewendet werden sollen (Standard: `'table table-striped table-bordered table-responsive'`).
+  - `className` (string): Die CSS-Klassen, die auf die Tabelle angewendet werden sollen (Standard: `'table table-striped table-bordered table-responsive align-middle'`).
   - `breakpoint` (string): Bootstrap-Breakpoint für das Top/Bottom-Layout (`flex-{breakpoint}-row`, Standard: `'md'`).
   - `paginationPrevNext` (boolean): Ob die Vorherige- und Nächste-Buttons in der Pagination angezeigt werden sollen (Standard: `true`).
   - `paginationRange` (number): Die Anzahl der Seiten, die auf jeder Seite der aktuellen Seite in der Pagination angezeigt werden sollen (Standard: `2`).
